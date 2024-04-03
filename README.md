@@ -1,2 +1,2 @@
-# wms-project-1
-Project 1 in 3rd year ITE 
+# wms_backend
+The backend for project 1 (warehouse management system) in the ITE at Damascus University.
