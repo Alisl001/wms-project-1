@@ -38,6 +38,9 @@ class Order(models.Model):
     pack_date = models.DateField(null=True, blank=True)
     cancel_date = models.DateField(null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 
 #OrderDetail Model for the table in the database 
@@ -47,6 +50,9 @@ class OrderDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    def __str__(self):
+        return self.name
 
 
 
@@ -55,6 +61,9 @@ class OrderDetail(models.Model):
 class Warehouse(models.Model):
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.name
 
 
 
@@ -64,6 +73,9 @@ class Shelf(models.Model):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     capacity = models.IntegerField()
+    
+    def __str__(self):
+        return self.name
 
 
 
@@ -80,6 +92,9 @@ class Inventory(models.Model):
     quantity = models.IntegerField()
     expiry_date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='good')
+    
+    def __str__(self):
+        return self.name
 
 
 
@@ -95,6 +110,9 @@ class Shipment(models.Model):
     supplier = models.CharField(max_length=100)
     date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
+    
+    def __str__(self):
+        return self.name
 
 
 
@@ -105,6 +123,9 @@ class ShipmentDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     status = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
 
 
 
@@ -119,5 +140,8 @@ class Notification(models.Model):
     message = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Not Read')
     date = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.name
 
 
