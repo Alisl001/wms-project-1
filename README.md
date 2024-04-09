@@ -57,7 +57,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 
 #### 2. Login
 
-- **URL:**  [http://127.0.0.1:8000/api/register/]() 
+- **URL:**  [http://127.0.0.1:8000/api/login/]() 
 - **Method:**  POST 
 - **Authorization:**  Not required 
 - **Parameters:** 
@@ -99,5 +99,32 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
+#### 3. Logout 
+- **URL:**  [http://127.0.0.1:8000/api/logout/]() 
+- **Method:**  POST 
+- **Authorization:**  Required (Bearer Token) 
+- **Parameters:**  None 
+- **Request Example:** 
+- No additional parameters are required. 
+
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK 
+```json
+{
+    "detail": "Logged out successfully."
+}
+``` 
+- **Response Example (Error):** 
+- **Status Code:**  `401` Unauthorized 
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+```json
+{
+    "detail": "Invalid token."
+}
+```
 
 
