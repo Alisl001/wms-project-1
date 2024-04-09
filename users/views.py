@@ -94,3 +94,60 @@ def userLogout(request):
 
 
 
+# Password reset request API
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def passwordResetRequest(request):
+    email = request.data.get('email', None)
+    if email is None:
+        return Response({'detail': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if the email exists in the database
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({'detail': 'Email not found in the database.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Generate a random 6-digit code
+    code = 135246
+
+    return Response({'detail': 'Password reset code sent to your email.'}, status=status.HTTP_200_OK)
+
+
+
+# Password reset confirm API
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def passwordResetConfirm(request):
+    email = request.data.get('email', None)
+    code = request.data.get('code', None)
+    password = request.data.get('password', None)
+    confirm_password = request.data.get('confirm_password', None)
+
+    if not all([email, code, password, confirm_password]):
+        return Response({'detail': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if the email exists in the database
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({'detail': 'Email not found in the database.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if the provided code matches the saved code
+    if code != 135246:
+        return Response({'detail': 'Invalid code.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if passwords match
+    if password != confirm_password:
+        return Response({'detail': 'Passwords do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Reset the password
+    user.set_password(password)
+    user.save()
+    
+    return Response({'detail': 'Password reset successful.'}, status=status.HTTP_200_OK)
+
+
+
+
+
