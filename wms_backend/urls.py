@@ -6,6 +6,6 @@ from users.views import userRegistration
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register/', userRegistration, name='userRegister'),
+    path('api/register/', userRegistration, name='userRegister'),
 
 ]
