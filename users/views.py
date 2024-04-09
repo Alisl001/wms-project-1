@@ -123,6 +123,7 @@ def passwordResetConfirm(request):
     code = request.data.get('code', None)
     password = request.data.get('password', None)
     confirm_password = request.data.get('confirm_password', None)
+    codeVlue = "135246"
 
     if not all([email, code, password, confirm_password]):
         return Response({'detail': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -134,7 +135,7 @@ def passwordResetConfirm(request):
         return Response({'detail': 'Email not found in the database.'}, status=status.HTTP_404_NOT_FOUND)
 
     # Check if the provided code matches the saved code
-    if code != 135246:
+    if code != codeVlue:
         return Response({'detail': 'Invalid code.'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if passwords match
