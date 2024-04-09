@@ -24,8 +24,8 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 ```json
 {
     "first_name": "Ali",
-    "last_name": "Qasem",
-    "username": "aliq",
+    "last_name": "Sliman",
+    "username": "Alisl001",
     "email": "test@email.com",
     "password": "12345678",
     "confirm_password": "12345678",
