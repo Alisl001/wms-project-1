@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from django.contrib.auth import authenticate, get_user_model
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 
 
@@ -34,3 +36,47 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             is_superuser=(role == 'admin'), 
         )
         return user
+
+
+UserModel = get_user_model()
+
+class CustomAuthTokenSerializer(serializers.Serializer):
+    
+    username_or_email = serializers.CharField(label="Username or Email")
+    password = serializers.CharField(label="Password", style={'input_type': 'password'})
+
+    def validate(self, attrs):
+        username_or_email = attrs.get('username_or_email')
+        password = attrs.get('password')
+
+        user = None
+
+        # Check if the input is an email
+        if '@' in username_or_email:
+            try:
+                user = UserModel.objects.get(email=username_or_email)
+            except UserModel.DoesNotExist:
+                pass  # User with the provided email doesn't exist
+
+        # If the user is not found by email, try to authenticate with username
+        if not user:
+            user = authenticate(request=self.context.get('request'), username=username_or_email, password=password)
+
+        if not user:
+            msg = 'Unable to log in with provided credentials.'
+            raise serializers.ValidationError(msg, code='authorization')
+
+        attrs['user'] = user
+        return attrs
+
+class UserLoginResponseSerializer(serializers.Serializer):
+    access_token = serializers.CharField()
+    token_type = serializers.CharField()
+    expires_in = serializers.IntegerField()
+    user = serializers.DictField(child=serializers.CharField())
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user']['date_joined'] = instance.user.date_joined.isoformat()
+        return representation
+
