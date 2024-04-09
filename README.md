@@ -127,4 +127,92 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
+#### 4. Password reset request
+
+- **URL:**  [http://127.0.0.1:8000/api/password-reset/request/]() 
+- **Method:**  POST 
+- **Authorization:**  Not required 
+- **Parameters:** 
+- ```email``` (string, required): User email.
+
+- **Request Example:** 
+```json
+{
+    "email": "test@email.com"
+}
+```
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+{
+    "detail": "Password reset code sent to your email."
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `400` Bad Request
+```json
+{
+    "detail": "Email is required."
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `404` Not Found
+```json
+{
+    "detail": "Email not found in the database."
+}
+```
+
+#### 5. Password reset confirm
+
+- **URL:**  [http://127.0.0.1:8000/api/password-reset/confirm/]() 
+- **Method:**  POST 
+- **Authorization:**  Not required 
+- **Parameters:** 
+- ```email``` (string, required): User email.
+- ```code``` (string, required): The code sent to the user email in the passord reset request API.
+- ```password``` (string, required): New password.
+- ```confirm_password``` (string, required): Confirm new password.
+
+- **Request Example:** 
+```json
+{
+    "email": "test@email.com",
+    "code": "135246",
+    "password": "12345678",
+    "confirm_password": "12345678"
+}
+```
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+{
+    "detail": "Password reset successful."
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `400` Bad Request
+```json
+{
+    "detail": "All fields are required."
+}
+```
+```json
+{
+    "detail": "Invalid code."
+}
+```
+```json
+{
+    "detail": "Passwords do not match."
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `404` Not Found
+```json
+{
+    "detail": "Email not found in the database."
+}
+```
+
 
