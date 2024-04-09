@@ -55,3 +55,49 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
+#### 2. Login
+
+- **URL:**  [http://127.0.0.1:8000/api/register/]() 
+- **Method:**  POST 
+- **Authorization:**  Not required 
+- **Parameters:** 
+- ```username_or_email``` (string, required): User username or email (users can log in with either their username or email).
+- ```password``` (string, required): User password. 
+
+- **Request Example:** 
+```json
+{
+    "username_or_email": "Alisl001",
+    "password": "12345678"
+}
+```
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+{
+    "access_token": "ed745e109b4b6ef602a1f6d574c217d85be670e8",
+    "token_type": "bearer",
+    "expires_in": 36000,
+    "user": {
+        "id": 6,
+        "first_name": "Ali",
+        "last_name": "Sliman",
+        "username": "Alisl001",
+        "email": "test@email.com",
+        "date_joined": "2024-04-09T13:01:51.139743Z",
+        "role": "staff"
+    }
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `400` Bad Request
+```json
+{
+    "non_field_errors": [
+        "Unable to log in with provided credentials."
+    ]
+}
+```
+
+
+
