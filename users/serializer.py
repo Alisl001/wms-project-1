@@ -102,4 +102,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return user
 
 
+class StaffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name']
 
