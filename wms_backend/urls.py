@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from users.views import userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetConfirm
+from users.views import userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetConfirm, retrieveUserById, myDetails
 
 
 urlpatterns = [
@@ -10,5 +10,7 @@ urlpatterns = [
     path('api/logout/', userLogout, name='userLogout'),
     path('api/password-reset/request/', passwordResetRequest, name='passwordResetRequest'),
     path('api/password-reset/confirm/', passwordResetConfirm, name='passwordResetConfirm'),
+    path('api/users/<int:id>/', retrieveUserById, name='user-detail'),
+    path('api/my-details/', myDetails, name='my-details'),
 
 ]

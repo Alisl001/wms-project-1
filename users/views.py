@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.authentication import BearerTokenAuthentication
-from .serializer import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer
+from .serializer import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -148,6 +148,29 @@ def passwordResetConfirm(request):
     
     return Response({'detail': 'Password reset successful.'}, status=status.HTTP_200_OK)
 
+
+
+#User details API
+@api_view(['GET'])
+@permission_classes([AllowAny]) 
+def retrieveUserById(request, id):
+    try:
+        user = User.objects.get(pk=id)
+    except User.DoesNotExist:
+        return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = CustomUserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAuthenticated]) 
+def myDetails(request):
+    user = request.user
+    serializer = CustomUserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
