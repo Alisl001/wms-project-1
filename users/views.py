@@ -9,6 +9,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authentication import TokenAuthentication
+from django.utils import timezone
 
 
 #Register API
@@ -35,6 +36,10 @@ def userAuthTokenLogin(request):
     # Get or create the token for the user
     token, created = Token.objects.get_or_create(user=user)
     
+    # Update the last_login time to the current time
+    user.last_login = timezone.now()
+    user.save(update_fields=['last_login'])
+
     # Determine the role based on user attributes
     if user.is_superuser:
         role = 'admin'
