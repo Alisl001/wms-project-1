@@ -80,3 +80,30 @@ class UserLoginResponseSerializer(serializers.Serializer):
         representation['user']['date_joined'] = instance.user.date_joined.isoformat()
         return representation
 
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'password', 'role']
+        extra_kwargs = {'password': {'write_only': True}}  # Hide password field in responses
+
+    def get_role(self, obj):
+        if obj.is_superuser:
+            return 'admin'
+        elif obj.is_staff:
+            return 'staff'
+        else:
+            return 'customer'
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
+
+
+class StaffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name']
+

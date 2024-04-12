@@ -54,6 +54,11 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
     ]
 }
 ```
+```json
+{
+    "detail": "All fields are required."
+}
+```
 
 #### 2. Login
 
@@ -212,6 +217,64 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 ```json
 {
     "detail": "Email not found in the database."
+}
+```
+
+#### 6. Get User Details by ID
+- **URL:**  [http://127.0.0.1:8000/api/users/<id>/]() 
+- **Method:**  GET 
+- **Authorization:**  Not required 
+- **Parameters:** 
+- None 
+- **Request Example:** 
+- No additional parameters required. 
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+{
+    "id": 6,
+    "username": "Alisl001",
+    "email": "test@email.com",
+    "first_name": "Ali",
+    "last_name": "Sliman",
+    "date_joined": "2024-04-09T13:01:51.139743Z",
+    "role": "staff"
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `404` Not Found
+```json
+{
+    "detail": "User not found"
+}
+```
+
+#### 6. Get User Details by Auth Token
+- **URL:**  [http://127.0.0.1:8000/api/my-details/]() 
+- **Method:**  GET 
+- **Authorization:**  Required (Bearer Token) 
+- **Parameters:** 
+- None 
+- **Request Example:** 
+- No additional parameters required. 
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+{
+    "id": 6,
+    "username": "Alisl001",
+    "email": "test@email.com",
+    "first_name": "Ali",
+    "last_name": "Sliman",
+    "date_joined": "2024-04-09T13:01:51.139743Z",
+    "role": "staff"
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `401` Unauthorized
+```json
+{
+    "detail": "Authentication credentials were not provided."
 }
 ```
 
