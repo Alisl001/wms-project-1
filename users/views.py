@@ -1,10 +1,12 @@
+from argparse import ONE_OR_MORE
+from ast import Not
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.authentication import BearerTokenAuthentication
-from .serializer import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer, StaffSerializer
+from .serializer import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer, StaffSerializer, UserInfoUpdateSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -213,10 +215,15 @@ def updateUserInfo(request):
     user = request.user
     data = request.data
 
-    serializer = CustomUserSerializer(user, data=data)
+    required_fields = ['first_name', 'last_name', 'email', 'username']
+    missing_fields = [field for field in required_fields if field not in data]
+    if len(missing_fields) == len(required_fields):
+        return Response({'detail': 'At least one of the following fields is required: first_name, last_name, email, username'}, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = UserInfoUpdateSerializer(user, data=data, partial=True)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"detail": "User info updated successfully."}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -225,14 +232,15 @@ def updateUserInfo(request):
 @api_view(['DELETE'])
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
-def deleteUserById(request, user_id):
+def deleteUserById(request, id):
     try:
-        user = User.objects.get(pk=user_id)
+        user = User.objects.get(pk=id)
+        user.delete()
+        return Response({"detail": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     except User.DoesNotExist:
         return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
-
-    user.delete()
-    return Response({"message": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

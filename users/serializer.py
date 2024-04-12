@@ -107,3 +107,21 @@ class StaffSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'first_name', 'last_name']
 
+
+class UserInfoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'email']
+
+    def validate(self, data):
+        username = data.get('username')
+        if User.objects.exclude(pk=self.instance.pk).filter(username=username).exists():
+            raise serializers.ValidationError("Username is already in use.")
+
+        email = data.get('email')
+        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
+            raise serializers.ValidationError("Email is already in use.")
+
+        return data
+
+

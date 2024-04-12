@@ -249,7 +249,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 6. Get User Details by Auth Token
+#### 7. Get User Details by Auth Token
 - **URL:**  [http://127.0.0.1:8000/api/my-details/]() 
 - **Method:**  GET 
 - **Authorization:**  Required (Bearer Token) 
@@ -269,6 +269,178 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
     "date_joined": "2024-04-09T13:01:51.139743Z",
     "role": "staff"
 }
+```
+- **Response Example (error):** 
+- **Status Code:**  `401` Unauthorized
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+#### 8. Change my password API 
+
+- **URL:**  [http://127.0.0.1:8000/api/user/change-password/]() 
+- **Method:**  POST 
+- **Authorization:**  Required (Bearer Token) 
+- **Parameters:** 
+- ```old_password``` (string, required): Old password.
+- ```new_password``` (string, required): New password.
+- ```confirm_new_password``` (string, required): New password confirmation.
+
+- **Request Example:** 
+```json
+{
+    "old_password": "12345678",
+    "new_password": "12345678",
+    "confirm_new_password": "12345678"
+}
+```
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+{
+    "detail": "Password changed successfully"
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `400` Bad Request
+```json
+{
+    "detail": "Old password is incorrect"
+}
+```
+```json
+{
+    "detail": "New password and confirm password do not match"
+}
+```
+
+#### 9. Update user info API 
+
+- **URL:**  [http://127.0.0.1:8000/api/user/update-info/]() 
+- **Method:**  PUT 
+- **Authorization:**  Required (Bearer Token) 
+- **Parameters:** 
+- ```first_name``` (string, optional): User first name.
+- ```last_name``` (string, optional): User last name.
+- ```username``` (string, optional): User username.
+- ```email``` (string, optional): User email.
+
+- **Request Example:** 
+```json
+{
+    "first_name": "Ali",
+    "last_name": "Sliman",
+    "username": "Alisl001",
+    "email": "test@email.com"
+}
+```
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+{
+    "detail": "User info updated successfully."
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `400` Bad Request
+```json
+{
+    "username": [
+        "A user with that username already exists."
+    ]
+}
+```
+```json
+{
+    "non_field_errors": [
+        "Email is already in use."
+    ]
+}
+```
+
+#### 10. Delete my account by user auth token 
+- **URL:**  [http://127.0.0.1:8000/api/user/delete-my-account/]() 
+- **Method:**  DELETE 
+- **Authorization:**  Required (Bearer Token) 
+- **Parameters:** 
+- None 
+- **Request Example:** 
+- No additional parameters required. 
+- **Response Example (Success):** 
+- **Status Code:**  `204` No Content 
+```json
+{
+    "detail": "User account deleted successfully"
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `401` Unauthorized
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+```json
+{
+    "detail": "Invalid token."
+}
+```
+
+#### 11. Delete user account by admin  
+- **URL:**  [http://127.0.0.1:8000/api/user/delete/<id>/]() 
+- **Method:**  DELETE 
+- **Authorization:**  Required (Bearer Token Admin account only) 
+- **Parameters:** 
+- None (but the user id in the link)
+- **Request Example:** 
+- No additional parameters required. 
+- **Response Example (Success):** 
+- **Status Code:**  `204` No Content 
+```json
+{
+    "detail": "User deleted successfully"
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `401` Unauthorized
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `404` Not Found
+```json
+{
+    "error": "User does not exist"
+}
+```
+
+#### 12. Get Staff members list 
+- **URL:**  [http://127.0.0.1:8000/api/users/staff/]() 
+- **Method:**  GET 
+- **Authorization:**  Required (Bearer Token Admin account only) 
+- **Parameters:** 
+- None 
+- **Request Example:** 
+- No additional parameters required. 
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+[
+    {
+        "id": 3,
+        "first_name": "Ali",
+        "last_name": "Sliman"
+    },
+    {
+        "id": 4,
+        "first_name": "Ali",
+        "last_name": "Qasem"
+    },
+]
 ```
 - **Response Example (error):** 
 - **Status Code:**  `401` Unauthorized
