@@ -54,6 +54,11 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
     ]
 }
 ```
+```json
+{
+    "detail": "All fields are required."
+}
+```
 
 #### 2. Login
 

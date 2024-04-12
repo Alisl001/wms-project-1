@@ -16,6 +16,17 @@ from django.utils import timezone
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def userRegistration(request):
+    first_name = request.data.get('first_name', None)
+    last_name = request.data.get('last_name', None)
+    email = request.data.get('email', None)
+    username = request.data.get('username', None)
+    password = request.data.get('password', None)
+    confirm_password = request.data.get('confirm_password', None)  
+    role = request.data.get('role', None)
+
+    if not all([first_name, last_name, email, username, password, confirm_password, role]):
+        return Response({'detail': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
+      
     if request.method == 'POST':
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
