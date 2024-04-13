@@ -6,7 +6,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 
 ### User Management Endpoints 
 
-#### 1. Register 
+#### 1. Register    ```mobile```
 
 - **URL:**  [http://127.0.0.1:8000/api/register/]() 
 - **Method:**  POST 
@@ -60,7 +60,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 2. Login
+#### 2. Login    ```mobile``` ```web```
 
 - **URL:**  [http://127.0.0.1:8000/api/login/]() 
 - **Method:**  POST 
@@ -104,7 +104,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 3. Logout 
+#### 3. Logout    ```mobile``` ```web```
 - **URL:**  [http://127.0.0.1:8000/api/logout/]() 
 - **Method:**  POST 
 - **Authorization:**  Required (Bearer Token) 
@@ -132,7 +132,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 4. Password reset request
+#### 4. Password reset request    ```mobile``` 
 
 - **URL:**  [http://127.0.0.1:8000/api/password-reset/request/]() 
 - **Method:**  POST 
@@ -168,7 +168,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 5. Password reset confirm
+#### 5. Password reset confirm    ```mobile``` 
 
 - **URL:**  [http://127.0.0.1:8000/api/password-reset/confirm/]() 
 - **Method:**  POST 
@@ -220,7 +220,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 6. Get User Details by ID
+#### 6. Get User Details by ID    ```web``` 
 - **URL:**  [http://127.0.0.1:8000/api/users/<id>/]() 
 - **Method:**  GET 
 - **Authorization:**  Not required 
@@ -249,7 +249,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 7. Get User Details by Auth Token
+#### 7. Get User Details by Auth Token    ```mobile```
 - **URL:**  [http://127.0.0.1:8000/api/my-details/]() 
 - **Method:**  GET 
 - **Authorization:**  Required (Bearer Token) 
@@ -278,7 +278,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 8. Change my password API 
+#### 8. Change my password API    ```mobile``` 
 
 - **URL:**  [http://127.0.0.1:8000/api/user/change-password/]() 
 - **Method:**  POST 
@@ -316,7 +316,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 9. Update user info API 
+#### 9. Update user info API    ```mobile``` 
 
 - **URL:**  [http://127.0.0.1:8000/api/user/update-info/]() 
 - **Method:**  PUT 
@@ -360,7 +360,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 10. Delete my account by user auth token 
+#### 10. Delete my account by user auth token     ```mobile```  
 - **URL:**  [http://127.0.0.1:8000/api/user/delete-my-account/]() 
 - **Method:**  DELETE 
 - **Authorization:**  Required (Bearer Token) 
@@ -388,7 +388,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 11. Delete user account by admin  
+#### 11. Delete user account by admin    ```web``` 
 - **URL:**  [http://127.0.0.1:8000/api/user/delete/<id>/]() 
 - **Method:**  DELETE 
 - **Authorization:**  Required (Bearer Token Admin account only) 
@@ -418,7 +418,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 12. Get Staff members list 
+#### 12. Get Staff members list      ```web```
 - **URL:**  [http://127.0.0.1:8000/api/users/staff/]() 
 - **Method:**  GET 
 - **Authorization:**  Required (Bearer Token Admin account only) 
