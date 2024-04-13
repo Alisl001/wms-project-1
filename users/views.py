@@ -159,7 +159,8 @@ def passwordResetConfirm(request):
 
 #User details by ID API
 @api_view(['GET'])
-@permission_classes([AllowAny]) 
+@permission_classes([IsAdminUser]) 
+@authentication_classes([BearerTokenAuthentication])
 def retrieveUserById(request, id):
     try:
         user = User.objects.get(pk=id)
