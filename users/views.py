@@ -1,4 +1,3 @@
-from argparse import ONE_OR_MORE
 from ast import Not
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -159,7 +158,7 @@ def passwordResetConfirm(request):
 
 #User details by ID API
 @api_view(['GET'])
-@permission_classes([IsAuthenticated]) 
+@permission_classes([AllowAny]) 
 @authentication_classes([BearerTokenAuthentication])
 def retrieveUserById(request, id):
     try:

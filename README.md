@@ -221,7 +221,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 ```
 
 #### 6. Get User Details by ID    ```web``` 
-- **URL:**  [http://127.0.0.1:8000/api/users/<id>/]() 
+- **URL:**  [http://127.0.0.1:8000/api/users/(id)/]() 
 - **Method:**  GET 
 - **Authorization:**  Not required 
 - **Parameters:** 
@@ -389,7 +389,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 ```
 
 #### 11. Delete user account by admin    ```web``` 
-- **URL:**  [http://127.0.0.1:8000/api/user/delete/<id>/]() 
+- **URL:**  [http://127.0.0.1:8000/api/user/delete/(id)/]() 
 - **Method:**  DELETE 
 - **Authorization:**  Required (Bearer Token Admin account only) 
 - **Parameters:** 
