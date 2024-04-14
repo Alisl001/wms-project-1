@@ -1,4 +1,3 @@
-from argparse import ONE_OR_MORE
 from ast import Not
 from django.contrib.auth.models import User
 from rest_framework import status
