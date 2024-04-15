@@ -144,6 +144,40 @@
 					"response": []
 				},
 				{
+					"name": "Password reset code check",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@email.com\",\r\n    \"code\": \"135246\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/password-reset/code-check/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"password-reset",
+								"code-check",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Password reset confirm",
 					"request": {
 						"method": "POST",

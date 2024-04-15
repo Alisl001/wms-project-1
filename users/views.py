@@ -125,6 +125,29 @@ def passwordResetRequest(request):
 
 
 
+# Password reset check code API
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def passwordResetCodeCheck(request):
+    email = request.data.get('email', None)
+    code = request.data.get('code', None)
+    codeValue = "135246"
+
+    if not all([email, code]):
+        return Response({'detail': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({'detail': 'Email not found in the database.'}, status=status.HTTP_404_NOT_FOUND)
+
+    if code != codeValue:
+        return Response({'detail': 'Invalid code.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'detail': 'Code is correct, Now you can change your password.'}, status=status.HTTP_200_OK)
+
+
+
 # Password reset confirm API
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -133,7 +156,7 @@ def passwordResetConfirm(request):
     code = request.data.get('code', None)
     password = request.data.get('password', None)
     confirm_password = request.data.get('confirm_password', None)
-    codeVlue = "135246"
+    codeValue = "135246"
 
     if not all([email, code, password, confirm_password]):
         return Response({'detail': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -143,7 +166,7 @@ def passwordResetConfirm(request):
     except User.DoesNotExist:
         return Response({'detail': 'Email not found in the database.'}, status=status.HTTP_404_NOT_FOUND)
 
-    if code != codeVlue:
+    if code != codeValue:
         return Response({'detail': 'Invalid code.'}, status=status.HTTP_400_BAD_REQUEST)
 
     if password != confirm_password:
