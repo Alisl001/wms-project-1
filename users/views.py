@@ -147,7 +147,7 @@ def passwordResetCodeCheck(request):
     return Response({'detail': 'Code is correct, Now you can change your password.'}, status=status.HTTP_200_OK)
 
 
-
+# this is a comment 
 # Password reset confirm API
 @api_view(['POST'])
 @permission_classes([AllowAny])
