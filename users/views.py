@@ -261,9 +261,9 @@ def deleteUserById(request, id):
         user.delete()
         return Response({"detail": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     except User.DoesNotExist:
-        return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"detail": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
