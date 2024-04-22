@@ -36,7 +36,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 - **Status Code:**  `201` Created
 ```json
 {
-    "message": "User registered successfully."
+    "detail": "User registered successfully."
 }
 ```
 - **Response Example (error):** 
