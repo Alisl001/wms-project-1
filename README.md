@@ -168,7 +168,50 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 5. Password reset confirm    ```mobile``` 
+#### 5. Password reset code check    ```mobile``` 
+
+- **URL:**  [http://127.0.0.1:8000/api/password-reset/code-check/]() 
+- **Method:**  POST 
+- **Authorization:**  Not required 
+- **Parameters:** 
+- ```email``` (string, required): User email.
+- ```code``` (string, required): The code sent to the user email in the passord reset request API.
+
+- **Request Example:** 
+```json
+{
+    "email": "test@email.com",
+    "code": "135246"
+}
+```
+- **Response Example (Success):** 
+- **Status Code:**  `200` OK
+```json
+{
+    "detail": "Code is correct, Now you can change your password."
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `400` Bad Request
+```json
+{
+    "detail": "All fields are required."
+}
+```
+```json
+{
+    "detail": "Invalid code."
+}
+```
+- **Response Example (error):** 
+- **Status Code:**  `404` Not Found
+```json
+{
+    "detail": "Email not found in the database."
+}
+```
+
+#### 6. Password reset confirm    ```mobile``` 
 
 - **URL:**  [http://127.0.0.1:8000/api/password-reset/confirm/]() 
 - **Method:**  POST 
@@ -220,7 +263,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 6. Get User Details by ID    ```web``` 
+#### 7. Get User Details by ID    ```web``` 
 - **URL:**  [http://127.0.0.1:8000/api/users/(id)/]() 
 - **Method:**  GET 
 - **Authorization:**  Not required 
@@ -249,7 +292,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 7. Get User Details by Auth Token    ```mobile```
+#### 8. Get User Details by Auth Token    ```mobile```
 - **URL:**  [http://127.0.0.1:8000/api/my-details/]() 
 - **Method:**  GET 
 - **Authorization:**  Required (Bearer Token) 
@@ -278,7 +321,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 8. Change my password API    ```mobile``` 
+#### 9. Change my password API    ```mobile``` 
 
 - **URL:**  [http://127.0.0.1:8000/api/user/change-password/]() 
 - **Method:**  POST 
@@ -316,7 +359,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 9. Update user info API    ```mobile``` 
+#### 10. Update user info API    ```mobile``` 
 
 - **URL:**  [http://127.0.0.1:8000/api/user/update-info/]() 
 - **Method:**  PUT 
@@ -360,7 +403,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 10. Delete my account by user auth token     ```mobile```  
+#### 11. Delete my account by user auth token     ```mobile```  
 - **URL:**  [http://127.0.0.1:8000/api/user/delete-my-account/]() 
 - **Method:**  DELETE 
 - **Authorization:**  Required (Bearer Token) 
@@ -388,7 +431,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 11. Delete user account by admin    ```web``` 
+#### 12. Delete user account by admin    ```web``` 
 - **URL:**  [http://127.0.0.1:8000/api/user/delete/(id)/]() 
 - **Method:**  DELETE 
 - **Authorization:**  Required (Bearer Token Admin account only) 
@@ -418,7 +461,7 @@ This document outlines the functionalities and usage of the WMS APIs. It serves 
 }
 ```
 
-#### 12. Get Staff members list      ```web```
+#### 13. Get Staff members list      ```web```
 - **URL:**  [http://127.0.0.1:8000/api/users/staff/]() 
 - **Method:**  GET 
 - **Authorization:**  Required (Bearer Token Admin account only) 
