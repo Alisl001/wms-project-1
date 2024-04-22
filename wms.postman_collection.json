@@ -367,13 +367,22 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "",
+									"value": "c66af1663093a45c130e6918082e3f0be5e2842a",
 									"type": "string"
 								}
 							]
 						},
 						"method": "DELETE",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/user/delete-my-account/",
 							"protocol": "http",
