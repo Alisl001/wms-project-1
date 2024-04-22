@@ -11,6 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
+from django.contrib.auth.hashers import check_password
 
 
 #Register API
@@ -32,7 +33,7 @@ def userRegistration(request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
+            return Response({'detail': "User registered successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -147,7 +148,6 @@ def passwordResetCodeCheck(request):
     return Response({'detail': 'Code is correct, Now you can change your password.'}, status=status.HTTP_200_OK)
 
 
-# this is a comment 
 # Password reset confirm API
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -261,9 +261,9 @@ def deleteUserById(request, id):
         user.delete()
         return Response({"detail": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     except User.DoesNotExist:
-        return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"detail": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -273,6 +273,12 @@ def deleteUserById(request, id):
 @permission_classes([IsAuthenticated])
 def deleteMyAccount(request):
     user = request.user
+    data = request.data
+    provided_password = data.get('password', '')
+
+    # Check if the provided password matches the user's password
+    if not check_password(provided_password, user.password):
+        return Response({'detail': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         user.delete()
