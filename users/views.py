@@ -11,6 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
+from django.contrib.auth.hashers import check_password
 
 
 #Register API
@@ -147,7 +148,6 @@ def passwordResetCodeCheck(request):
     return Response({'detail': 'Code is correct, Now you can change your password.'}, status=status.HTTP_200_OK)
 
 
-# this is a comment 
 # Password reset confirm API
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -273,6 +273,12 @@ def deleteUserById(request, id):
 @permission_classes([IsAuthenticated])
 def deleteMyAccount(request):
     user = request.user
+    data = request.data
+    provided_password = data.get('password', '')
+
+    # Check if the provided password matches the user's password
+    if not check_password(provided_password, user.password):
+        return Response({'detail': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         user.delete()
