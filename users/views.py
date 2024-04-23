@@ -1,5 +1,6 @@
 from ast import Not
 from django.contrib.auth.models import User
+from backend.models import StaffPermission
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.views import APIView
@@ -45,6 +46,19 @@ def userAuthTokenLogin(request):
     serializer = CustomAuthTokenSerializer(data=request.data, context={'request': request})
     serializer.is_valid(raise_exception=True)
     user = serializer.validated_data['user']
+
+        # Check if the user is a staff member
+    if user.is_staff and not user.is_superuser:
+        try:
+            # Attempt to get the staff permission record for the user
+            staff_permission = StaffPermission.objects.get(user=user)
+        except StaffPermission.DoesNotExist:
+            # If there's no staff permission record, deny access
+            return Response({'detail': 'Staff member requires permission from the admin.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Check if the staff member has permission to log in
+        if not staff_permission.is_permitted:
+            return Response({'detail': 'Staff member requires permission from the admin.'}, status=status.HTTP_403_FORBIDDEN)
     
     token, created = Token.objects.get_or_create(user=user)
     
@@ -300,6 +314,30 @@ def showStaffMembers(request):
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+
+# Give permission to the new staff member API
+@api_view(['POST'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAdminUser])
+def grantStaffPermission(request, staff_id):
+    try:
+        user = User.objects.get(id=staff_id)
+    except User.DoesNotExist:
+        return Response({'detail': 'Staff member not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if not user.is_staff:
+        return Response({'detail': 'User is not a staff member.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        staff_permission = StaffPermission.objects.get(user=user)
+    except StaffPermission.DoesNotExist:
+        staff_permission = StaffPermission.objects.create(user=user)
+    
+    staff_permission.is_permitted = True
+    staff_permission.save()
+
+    return Response({'detail': 'Permission granted successfully.'}, status=status.HTTP_200_OK)
 
 
 
