@@ -473,6 +473,78 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "List new staff members",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "34c605dd59ce2e5cdd1d13f757171e1275b3bc7f",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/users/new-staff-members/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"new-staff-members",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign staff permissions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "34c605dd59ce2e5cdd1d13f757171e1275b3bc7f",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/users/staff/assign-permission/2/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"staff",
+								"assign-permission",
+								"2",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

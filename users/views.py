@@ -320,6 +320,10 @@ def showStaffMembers(request):
 @permission_classes([IsAdminUser])
 def listNewStaffMembers(request):
     new_staff_members = User.objects.filter(is_staff=True, is_superuser=False).exclude(staff_permission__is_permitted=True)
+    
+    if not new_staff_members:
+        return Response({'detail': 'No new staff members without permissions found.'}, status=status.HTTP_404_NOT_FOUND)
+    
     serializer = StaffSerializer(new_staff_members, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
