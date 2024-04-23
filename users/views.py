@@ -307,8 +307,12 @@ def deleteMyAccount(request):
 @api_view(['GET'])
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
-def showStaffMembers(request):
+def listStaffMembers(request):
     staff_members = User.objects.filter(is_staff=True)
+
+    if not staff_members:
+        return Response({'detail': 'No staff members found.'}, status=status.HTTP_404_NOT_FOUND)
+
     serializer = StaffSerializer(staff_members, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -325,6 +329,21 @@ def listNewStaffMembers(request):
         return Response({'detail': 'No new staff members without permissions found.'}, status=status.HTTP_404_NOT_FOUND)
     
     serializer = StaffSerializer(new_staff_members, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+# Show the customer list API 
+@api_view(['GET'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAdminUser])
+def listCustomers(request):
+    customers = User.objects.filter(is_staff=False, is_superuser=False)
+
+    if not customers:
+        return Response({'detail': 'No customers found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = CustomUserSerializer(customers, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 

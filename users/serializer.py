@@ -117,6 +117,15 @@ class StaffSerializer(serializers.ModelSerializer):
         except StaffPermission.DoesNotExist:
             return False
 
+
+class CustomerSerializer(serializers.ModelSerializer):
+    is_staff_permitted = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+
+
 class UserInfoUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
