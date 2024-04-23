@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from users.views import passwordResetCodeCheck, userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, deleteMyAccount, deleteUserById, showStaffMembers
 
 
@@ -21,4 +23,4 @@ urlpatterns = [
     path('api/users/delete/<int:id>/', deleteUserById, name='deleteUserAccount'),
     path('api/users/staff/', showStaffMembers, name='showStaffMembers'),
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
