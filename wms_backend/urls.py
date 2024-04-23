@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from users.views import passwordResetCodeCheck, userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, deleteMyAccount, deleteUserById, showStaffMembers, grantStaffPermission
+from users.views import passwordResetCodeCheck, userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, deleteMyAccount, deleteUserById, showStaffMembers, listNewStaffMembers, assignStaffPermission
 
 
 urlpatterns = [
@@ -22,7 +22,8 @@ urlpatterns = [
     path('api/user/delete-my-account/', deleteMyAccount, name='deleteMyAccount'),
     path('api/users/delete/<int:id>/', deleteUserById, name='deleteUserAccount'),
     path('api/users/staff/', showStaffMembers, name='showStaffMembers'),
-    path('api/users/grant-permission/<int:staff_id>/', grantStaffPermission, name='grantStaffPermission'),
+    path('api/users/new-staff-members/', listNewStaffMembers, name='listNewStaffMembers'),
+    path('api/users/staff/assign-permission/<int:staff_id>/', assignStaffPermission, name='assignStaffPermission'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

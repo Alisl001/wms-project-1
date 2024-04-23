@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from backend.models import StaffPermission
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -103,10 +104,18 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class StaffSerializer(serializers.ModelSerializer):
+    is_staff_permitted = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_staff_permitted']
 
+    def get_is_staff_permitted(self, obj):
+        try:
+            staff_permission = StaffPermission.objects.get(user=obj)
+            return staff_permission.is_permitted
+        except StaffPermission.DoesNotExist:
+            return False
 
 class UserInfoUpdateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -123,5 +132,11 @@ class UserInfoUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Email is already in use.")
 
         return data
+
+
+class StaffPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StaffPermission
+        fields = ['is_permitted']
 
 

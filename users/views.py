@@ -309,9 +309,18 @@ def deleteMyAccount(request):
 @permission_classes([IsAdminUser])
 def showStaffMembers(request):
     staff_members = User.objects.filter(is_staff=True)
-
     serializer = StaffSerializer(staff_members, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+
+# Show the new staff members API 
+@api_view(['GET'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAdminUser])
+def listNewStaffMembers(request):
+    new_staff_members = User.objects.filter(is_staff=True, is_superuser=False).exclude(staff_permission__is_permitted=True)
+    serializer = StaffSerializer(new_staff_members, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -320,7 +329,7 @@ def showStaffMembers(request):
 @api_view(['POST'])
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
-def grantStaffPermission(request, staff_id):
+def assignStaffPermission(request, staff_id):
     try:
         user = User.objects.get(id=staff_id)
     except User.DoesNotExist:
@@ -337,7 +346,7 @@ def grantStaffPermission(request, staff_id):
     staff_permission.is_permitted = True
     staff_permission.save()
 
-    return Response({'detail': 'Permission granted successfully.'}, status=status.HTTP_200_OK)
+    return Response({'detail': 'Permission assigned successfully.'}, status=status.HTTP_200_OK)
 
 
 
