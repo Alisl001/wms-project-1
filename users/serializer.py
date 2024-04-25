@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
-from backend.models import StaffPermission
+from backend.models import StaffPermission, Warehouse
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.exceptions import ValidationError
 
 
 
@@ -144,8 +145,21 @@ class UserInfoUpdateSerializer(serializers.ModelSerializer):
 
 
 class StaffPermissionSerializer(serializers.ModelSerializer):
+    warehouse_id = serializers.IntegerField(required=False)
+
     class Meta:
         model = StaffPermission
-        fields = ['is_permitted']
+        fields = ['id', 'user', 'warehouse_id', 'is_permitted']
+        read_only_fields = ['id', 'user']
+
+    def validate_warehouse_id(self, value):
+        if value is None:
+            return None
+        
+        try:
+            warehouse = Warehouse.objects.get(id=value)
+            return value
+        except Warehouse.DoesNotExist:
+            raise serializers.ValidationError("Warehouse not found.")
 
 

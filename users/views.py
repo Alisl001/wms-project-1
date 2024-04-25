@@ -1,18 +1,19 @@
 from ast import Not
 from django.contrib.auth.models import User
-from backend.models import StaffPermission
+from backend.models import StaffPermission, Warehouse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.authentication import BearerTokenAuthentication
-from .serializer import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer, StaffSerializer, UserInfoUpdateSerializer
+from .serializer import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer, StaffSerializer, UserInfoUpdateSerializer, StaffPermissionSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
+from rest_framework.exceptions import ValidationError
 
 
 #Register API
@@ -353,21 +354,27 @@ def listCustomers(request):
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
 def assignStaffPermission(request, staff_id):
-    try:
-        user = User.objects.get(id=staff_id)
-    except User.DoesNotExist:
-        return Response({'detail': 'Staff member not found.'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = StaffPermissionSerializer(data=request.data)
+    if not serializer.is_valid():
+        errors = serializer.errors
+        if 'warehouse_id' in errors:
+            return Response({'detail': errors['warehouse_id'][0]}, status=status.HTTP_404_NOT_FOUND)
+        return Response(errors, status=status.HTTP_404_NOT_FOUND)
     
-    if not user.is_staff:
-        return Response({'detail': 'User is not a staff member.'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    try:
-        staff_permission = StaffPermission.objects.get(user=user)
-    except StaffPermission.DoesNotExist:
-        staff_permission = StaffPermission.objects.create(user=user)
-    
-    staff_permission.is_permitted = True
-    staff_permission.save()
+    user = User.objects.filter(id=staff_id, is_staff=True).first()
+    if not user:
+        return Response({'detail': 'Staff member not found or is not a staff member.'}, status=status.HTTP_404_NOT_FOUND)
+
+    staff_permission, created = StaffPermission.objects.get_or_create(user=user)
+
+    warehouse_id = serializer.validated_data.get('warehouse_id')
+    if warehouse_id:
+        try:
+            warehouse = Warehouse.objects.get(id=warehouse_id)
+            staff_permission.warehouse = warehouse
+            staff_permission.save()
+        except Warehouse.DoesNotExist:
+            return Response({'detail': 'Warehouse not found.'}, status=status.HTTP_404_NOT_FOUND)
 
     return Response({'detail': 'Permission assigned successfully.'}, status=status.HTTP_200_OK)
 
