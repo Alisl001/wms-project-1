@@ -545,6 +545,41 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "List Customers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "851dddce150dbf38a6967e33f35ecbbe77b7e73e",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/users/customers/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								"customers",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
