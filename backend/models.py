@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 # 1. User model default in django but this is for staff permission.
 class StaffPermission(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='staff_permission')
+    warehouse = models.ForeignKey('Warehouse', on_delete=models.CASCADE)
     is_permitted = models.BooleanField(default=False)
-
 
 # 2. Product model:
 class Product(models.Model):
@@ -21,14 +21,13 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.name} - {self.barcode}"
 
-
 # 3. Category model:
 class Category(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    
     def __str__(self):
         return f"{self.name}"
-
 
 # 4. Supplier model:
 class Supplier(models.Model):
@@ -41,29 +40,31 @@ class Supplier(models.Model):
     def __str__(self):
         return f"{self.name}"
 
-
 # 5. Warehouse model:
 class Warehouse(models.Model):
     name = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
+    warehouse_location = models.CharField(max_length=100)
+    
     def __str__(self):
         return f"{self.name}"
 
-
-# 6. Shelf model:
-class Shelf(models.Model):
+# 6. Location model:
+class Location(models.Model):
     warehouse = models.ForeignKey('Warehouse', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    aisle = models.CharField(max_length=10)
+    rack = models.CharField(max_length=10)
+    level = models.CharField(max_length=10)
     barcode = models.CharField(max_length=50, unique=True)
     capacity = models.IntegerField()
+    
     def __str__(self):
         return f"{self.name} ({self.barcode}) - Capacity: {self.capacity}"
-
 
 # 7. Inventory model:
 class Inventory(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    shelf = models.ForeignKey('Shelf', on_delete=models.CASCADE)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
     quantity = models.IntegerField()
     expiry_date = models.DateField()
     status_choices = [
@@ -72,7 +73,6 @@ class Inventory(models.Model):
         ('expired', 'Expired'),
     ]
     status = models.CharField(max_length=20, choices=status_choices)
-
 
 # 8. Shipment model:
 class Shipment(models.Model):
@@ -84,24 +84,26 @@ class Shipment(models.Model):
         ('received', 'Received'),
     ]
     status = models.CharField(max_length=20, choices=status_choices)
+    
     def __str__(self):
         return f"Shipment from {self.supplier.name} - Status: {self.status}"
-
 
 # 9. ShipmentDetail model:
 class ShipmentDetail(models.Model):
     shipment = models.ForeignKey('Shipment', on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    price_at_shipment = models.DecimalField(max_digits=10, decimal_places=2) 
     quantity = models.IntegerField()
+
     status_choices = [
         ('pending', 'Pending'),
         ('received', 'Received'),
         ('put_away', 'Put Away'),
     ]
     status = models.CharField(max_length=20, choices=status_choices)
+    
     def __str__(self):
         return f"Detail {self.id} of Shipment {self.shipment.id} - Product: {self.product.name}"
-
 
 # 10. Order model:
 class Order(models.Model):
@@ -122,16 +124,16 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     status = models.CharField(max_length=20, choices=status_choices)
+    
     def __str__(self):
         return f"Order {self.id} by {self.customer.username} - Total: ${self.total_price}"
-
 
 # 11. OrderDetail model:
 class OrderDetail(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    price_at_sale = models.DecimalField(max_digits=10, decimal_places=2) 
     quantity = models.IntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
     status_choices = [
         ('pending', 'Pending'),
         ('picked', 'Picked'),
@@ -141,7 +143,6 @@ class OrderDetail(models.Model):
     ]
     status = models.CharField(max_length=20, choices=status_choices)
 
-
 # 12. Activity model:
 class Activity(models.Model):
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -150,19 +151,22 @@ class Activity(models.Model):
         ('put_away', 'Put Away'),
         ('pick', 'Pick'),
         ('receive', 'Receive'),
+        ('transfer', 'Transfer'),
+        ('adjustment', 'Adjustment'),
+        ('cycle_count', 'Cycle Count'),
+        ('replenishment', 'Replenishment'),
         ('other', 'Other'),
     ]
     activity_type = models.CharField(max_length=20, choices=activity_type_choices)
     timestamp = models.DateTimeField(auto_now_add=True)
+    
     def __str__(self):
         return f"{self.activity_type} by {self.staff.username} on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
-
 
 # 13. Favorite model:
 class Favorite(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
-
 
 # 14. Report model: 
 class Report(models.Model):
@@ -175,10 +179,10 @@ class Report(models.Model):
     report_type = models.CharField(max_length=20, choices=report_type_choices)
     generated_at = models.DateTimeField(auto_now_add=True)
     data = models.JSONField()
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, blank=True, null=True)
+    
     def __str__(self):
-        return f"{self.report_type} generated on {self.generated_at.strftime('%Y-%m-%d')}"
-
-
+        return f"{self.report_type} generated on {self.generated_at.strftime('%Y-%m-%d')} in the warehouse {self.warehouse.name}."
 
 # 15. Notification model:
 class Notification(models.Model):
@@ -190,14 +194,12 @@ class Notification(models.Model):
         ('read', 'Read'),
     ]
     status = models.CharField(max_length=20, choices=status_choices)
-    
-
 
 # 16. BarcodeScanning model:
 class BarcodeScanning(models.Model):
     scanned_by = models.ForeignKey(User, on_delete=models.CASCADE)
     scanned_item = models.ForeignKey('Product', on_delete=models.CASCADE)
-    shelf = models.ForeignKey('Shelf', on_delete=models.CASCADE)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
     action_choices = [
         ('put_away', 'Put Away'),
         ('pick', 'Pick'),
@@ -205,10 +207,9 @@ class BarcodeScanning(models.Model):
     ]
     action = models.CharField(max_length=20, choices=action_choices)
     timestamp = models.DateTimeField(auto_now_add=True)
+    
     def __str__(self):
         return f"{self.action} of {self.scanned_item.name} by {self.scanned_by.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
-
-
 
 # 17. Wallet model:
 class Wallet(models.Model):
@@ -216,8 +217,7 @@ class Wallet(models.Model):
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
-            return f"Wallet of {self.customer.username} - Balance: ${self.balance}"
-
+        return f"Wallet of {self.customer.username} - Balance: ${self.balance}"
 
 # 18. TransactionLog model:
 class TransactionLog(models.Model):
@@ -235,6 +235,66 @@ class TransactionLog(models.Model):
     def __str__(self):
         return f"Transaction #{self.id} - User: {self.customer.username} - Type: {self.transaction_type} - Amount: {self.amount}"
 
+# 19. StockMovement model: 
+class StockMovement(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    from_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name='from_location')
+    to_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name='to_location')
+    quantity = models.IntegerField()
+    movement_type_choices = [
+        ('put_away', 'Put Away'),
+        ('pick', 'Pick'),
+        ('transfer', 'Transfer'),
+        ('receive', 'Receive'),
+        ('adjustment', 'Adjustment'),
+    ]
+    movement_type = models.CharField(max_length=20, choices=movement_type_choices)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
+# 20. StockAdjustment model: 
+class StockAdjustment(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    adjustment_type_choices = [
+        ('increase', 'Increase'),
+        ('decrease', 'Decrease'),
+    ]
+    adjustment_type = models.CharField(max_length=20, choices=adjustment_type_choices)
+    reason = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
+# 21. StockCount model: 
+class StockCount(models.Model):
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    counted_quantity = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
+# 22. PickingList model: 
+class PickingList(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    items = models.ManyToManyField('OrderDetail')
+    is_completed = models.BooleanField(default=False)
+    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+# 23. CycleCount model: 
+class CycleCount(models.Model):
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    counted_quantity = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+# 24. ReplenishmentRequest model: 
+class ReplenishmentRequest(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    status_choices = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    status = models.CharField(max_length=20, choices=status_choices, default='pending')
+    timestamp = models.DateTimeField(auto_now_add=True)
