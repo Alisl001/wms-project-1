@@ -42,7 +42,7 @@ class Supplier(models.Model):
 
 # 5. Warehouse model:
 class Warehouse(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     warehouse_location = models.CharField(max_length=100)
     
     def __str__(self):

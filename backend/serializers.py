@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Order, OrderDetail, Warehouse, Shelf, Inventory, Shipment, ShipmentDetail, Notification
+from .models import Product, Order, OrderDetail, Warehouse, Location, Inventory, Shipment, ShipmentDetail, Notification
 from django.contrib.auth.models import User
 
 
@@ -35,7 +35,7 @@ class WarehouseSerializer(serializers.ModelSerializer):
 
 class ShelfSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Shelf
+        model = Location
         fields = '__all__'
 
 

@@ -3,6 +3,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from users.views import userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, deleteMyAccount, deleteUserById, listStaffMembers, listNewStaffMembers, listCustomers, assignStaffPermission
+from warehouses.views import createWarehouse, updateWarehouse, deleteWarehouse, listWarehouses
 
 
 urlpatterns = [
@@ -25,5 +26,11 @@ urlpatterns = [
     path('api/users/new-staff-members/', listNewStaffMembers, name='listNewStaffMembers'),
     path('api/users/staff/assign-permission/<int:staff_id>/', assignStaffPermission, name='assignStaffPermission'),
     path('api/users/customers/', listCustomers, name='listCustomers'),
+
+    # Warehouse CRUD APIs
+    path('api/warehouse/create/', createWarehouse, name='createWarehouse'),
+    path('api/warehouse/update/<int:id>/', updateWarehouse, name='updateWarehouse'),
+    path('api/warehouse/delete/<int:id>/', deleteWarehouse, name='deleteWarehouse'),
+    path('api/warehouses/', listWarehouses, name='listWarehouses'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

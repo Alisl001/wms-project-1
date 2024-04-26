@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.authentication import BearerTokenAuthentication
-from .serializer import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer, StaffSerializer, UserInfoUpdateSerializer, StaffPermissionSerializer
+from .serializers import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer, StaffSerializer, UserInfoUpdateSerializer, StaffPermissionSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -14,6 +14,7 @@ from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 
 
 #Register API
@@ -36,6 +37,15 @@ def userRegistration(request):
         if serializer.is_valid():
             serializer.save()
             return Response({'detail': "User registered successfully."}, status=status.HTTP_201_CREATED)
+        elif not serializer.is_valid():
+            errors = serializer.errors
+            if 'email' in errors:
+                return Response({'detail': errors['email'][0]}, status=status.HTTP_400_BAD_REQUEST)
+            elif 'username' in errors:
+                return Response({'detail': errors['username'][0]}, status=status.HTTP_400_BAD_REQUEST)
+            elif 'password' in errors:
+                return Response({'detail': errors['password'][0]}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(errors, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -309,8 +319,11 @@ def deleteMyAccount(request):
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
 def listStaffMembers(request):
-    staff_members = User.objects.filter(is_staff=True)
-
+    staff_members = User.objects.filter(
+        is_staff=True, 
+        is_superuser=False,
+        staff_permission__is_permitted=True
+        )
     if not staff_members:
         return Response({'detail': 'No staff members found.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -347,6 +360,8 @@ def listCustomers(request):
     serializer = CustomUserSerializer(customers, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+def handle_not_found_error(error_message):
+    return Response({'detail': error_message}, status=status.HTTP_404_NOT_FOUND)
 
 
 # Give permission to the new staff member API
@@ -354,29 +369,18 @@ def listCustomers(request):
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
 def assignStaffPermission(request, staff_id):
-    serializer = StaffPermissionSerializer(data=request.data)
-    if not serializer.is_valid():
-        errors = serializer.errors
-        if 'warehouse_id' in errors:
-            return Response({'detail': errors['warehouse_id'][0]}, status=status.HTTP_404_NOT_FOUND)
-        return Response(errors, status=status.HTTP_404_NOT_FOUND)
-    
-    user = User.objects.filter(id=staff_id, is_staff=True).first()
-    if not user:
-        return Response({'detail': 'Staff member not found or is not a staff member.'}, status=status.HTTP_404_NOT_FOUND)
+    staff_member = get_object_or_404(User, id=staff_id, is_staff=True)
 
-    staff_permission, created = StaffPermission.objects.get_or_create(user=user)
+    serializer = StaffPermissionSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid():
+        warehouse_id = serializer.validated_data.get('warehouse_id')
 
-    warehouse_id = serializer.validated_data.get('warehouse_id')
-    if warehouse_id:
-        try:
-            warehouse = Warehouse.objects.get(id=warehouse_id)
-            staff_permission.warehouse = warehouse
-            staff_permission.save()
-        except Warehouse.DoesNotExist:
-            return Response({'detail': 'Warehouse not found.'}, status=status.HTTP_404_NOT_FOUND)
+        warehouse = get_object_or_404(Warehouse, id=warehouse_id)
 
-    return Response({'detail': 'Permission assigned successfully.'}, status=status.HTTP_200_OK)
+        staff_permission, created = StaffPermission.objects.get_or_create(user=staff_member, warehouse=warehouse)
+        staff_permission.is_permitted = True
+        staff_permission.save()
 
-
-
+        return Response({'detail': 'Permission assigned successfully.'}, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
