@@ -1,7 +1,10 @@
 from django.contrib.auth.models import User
+from backend.models import StaffPermission, Warehouse
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.exceptions import ValidationError
+from warehouses.serializers import WarehouseSerializer
 
 
 
@@ -56,9 +59,8 @@ class CustomAuthTokenSerializer(serializers.Serializer):
             try:
                 user = UserModel.objects.get(email=username_or_email)
             except UserModel.DoesNotExist:
-                pass  # User with the provided email doesn't exist
+                pass  
 
-        # If the user is not found by email, try to authenticate with username
         if not user:
             user = authenticate(request=self.context.get('request'), username=username_or_email, password=password)
 
@@ -87,8 +89,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'password', 'role']
-        extra_kwargs = {'password': {'write_only': True}}  # Hide password field in responses
-
+        extra_kwargs = {'password': {'write_only': True}}  
     def get_role(self, obj):
         if obj.is_superuser:
             return 'admin'
@@ -103,9 +104,35 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class StaffSerializer(serializers.ModelSerializer):
+    is_staff_permitted = serializers.SerializerMethodField()
+    permitted_warehouse = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_staff_permitted', 'permitted_warehouse']
+
+    def get_is_staff_permitted(self, obj):
+        try:
+            staff_permission = StaffPermission.objects.get(user=obj)
+            return staff_permission.is_permitted
+        except StaffPermission.DoesNotExist:
+            return False
+
+    def get_permitted_warehouse(self, obj):
+        try:
+            staff_permission = StaffPermission.objects.get(user=obj)
+            warehouse = staff_permission.warehouse
+            return WarehouseSerializer(warehouse).data
+        except StaffPermission.DoesNotExist:
+            return None
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    is_staff_permitted = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
 
 class UserInfoUpdateSerializer(serializers.ModelSerializer):
@@ -125,3 +152,19 @@ class UserInfoUpdateSerializer(serializers.ModelSerializer):
         return data
 
 
+class StaffPermissionSerializer(serializers.ModelSerializer):
+    warehouse_id = serializers.IntegerField()
+
+    class Meta:
+        model = StaffPermission
+        fields = ['warehouse_id']
+
+    def validate(self, data):
+        if 'warehouse_id' not in data:
+            raise serializers.ValidationError("Warehouse ID is required.")
+        
+        user = self.context['request'].user
+        if not user.is_staff:
+            raise serializers.ValidationError("Only staff members can be assigned permissions.")
+        
+        return data

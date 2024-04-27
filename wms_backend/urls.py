@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path
-from users.views import passwordResetCodeCheck, userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, deleteMyAccount, deleteUserById, showStaffMembers
+from django.conf import settings
+from django.conf.urls.static import static
+from users.views import userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, deleteMyAccount, deleteUserById, listStaffMembers, listNewStaffMembers, listCustomers, assignStaffPermission
+from warehouses.views import createWarehouse, updateWarehouse, deleteWarehouse, listWarehouses
 
 
 urlpatterns = [
@@ -19,6 +22,15 @@ urlpatterns = [
     path('api/user/update-info/', updateUserInfo, name='updateUserInfo'),
     path('api/user/delete-my-account/', deleteMyAccount, name='deleteMyAccount'),
     path('api/users/delete/<int:id>/', deleteUserById, name='deleteUserAccount'),
-    path('api/users/staff/', showStaffMembers, name='showStaffMembers'),
+    path('api/users/staff/', listStaffMembers, name='listStaffMembers'),
+    path('api/users/new-staff-members/', listNewStaffMembers, name='listNewStaffMembers'),
+    path('api/users/staff/assign-permission/<int:staff_id>/', assignStaffPermission, name='assignStaffPermission'),
+    path('api/users/customers/', listCustomers, name='listCustomers'),
 
-]
+    # Warehouse CRUD APIs
+    path('api/warehouse/create/', createWarehouse, name='createWarehouse'),
+    path('api/warehouse/update/<int:id>/', updateWarehouse, name='updateWarehouse'),
+    path('api/warehouse/delete/<int:id>/', deleteWarehouse, name='deleteWarehouse'),
+    path('api/warehouses/', listWarehouses, name='listWarehouses'),
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
