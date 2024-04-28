@@ -65,8 +65,7 @@ class CustomAuthTokenSerializer(serializers.Serializer):
             user = authenticate(request=self.context.get('request'), username=username_or_email, password=password)
 
         if not user:
-            msg = 'Unable to log in with provided credentials.'
-            raise serializers.ValidationError(msg, code='authorization')
+            raise serializers.ValidationError({'detail':'Unable to log in with provided credentials.'})
 
         attrs['user'] = user
         return attrs
