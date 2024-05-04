@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from users.views import userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, deleteMyAccount, deleteUserById, listStaffMembers, listNewStaffMembers, listCustomers, assignStaffPermission
 from warehouses.views import createWarehouse, updateWarehouse, deleteWarehouse, listWarehouses
 from suppliers.views import listSuppliers, supplierInfo, createSupplier, updateSupplier, deleteSupplier, uploadSupplierPhoto
+from categories.views import listCategories, categoryInfo, createCategory, updateCategory, deleteCategory
 
 
 
@@ -42,5 +43,12 @@ urlpatterns = [
     path('api/suppliers/<int:id>/update/', updateSupplier, name='updateSupplier'),
     path('api/suppliers/<int:id>/delete/', deleteSupplier, name='deleteSupplier'),
     path('api/suppliers/<int:id>/upload_photo/', uploadSupplierPhoto, name='uploadSupplierPhoto'),
+
+    # Categories management APIs
+    path('api/categories/', listCategories, name='listCategories'),
+    path('api/categories/<int:id>/', categoryInfo, name='categoryInfo'),
+    path('api/categories/create/', createCategory, name='createCategory'),
+    path('api/categories/<int:id>/update/', updateCategory, name='updateCategory'),
+    path('api/categories/<int:id>/delete/', deleteCategory, name='deleteCategory'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
