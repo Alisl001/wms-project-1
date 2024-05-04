@@ -4,6 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from users.views import userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, deleteMyAccount, deleteUserById, listStaffMembers, listNewStaffMembers, listCustomers, assignStaffPermission
 from warehouses.views import createWarehouse, updateWarehouse, deleteWarehouse, listWarehouses
+from suppliers.views import listSuppliers, supplierInfo, createSupplier, updateSupplier, deleteSupplier, uploadSupplierPhoto
+
 
 
 urlpatterns = [
@@ -32,5 +34,13 @@ urlpatterns = [
     path('api/warehouse/update/<int:id>/', updateWarehouse, name='updateWarehouse'),
     path('api/warehouse/delete/<int:id>/', deleteWarehouse, name='deleteWarehouse'),
     path('api/warehouses/', listWarehouses, name='listWarehouses'),
+
+    # Supplier management APIs
+    path('api/suppliers/', listSuppliers, name='listSuppliers'),
+    path('api/suppliers/<int:id>/', supplierInfo, name='supplierInfo'),
+    path('api/suppliers/create/', createSupplier, name='createSupplier'),
+    path('api/suppliers/<int:id>/update/', updateSupplier, name='updateSupplier'),
+    path('api/suppliers/<int:id>/delete/', deleteSupplier, name='deleteSupplier'),
+    path('api/suppliers/<int:id>/upload_photo/', uploadSupplierPhoto, name='uploadSupplierPhoto'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
