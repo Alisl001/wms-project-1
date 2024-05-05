@@ -6,3 +6,8 @@ class SupplierSerializer(serializers.ModelSerializer):
         model = Supplier
         fields = ['id', 'name', 'contact_person', 'email', 'phone', 'photo']
 
+class CustomSupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supplier
+        fields = ['id', 'name', 'photo']
+

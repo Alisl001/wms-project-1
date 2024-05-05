@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 from backend.models import Category
-from .serializers import CategorySerializer
+from .serializers import CategorySerializer, CategoryNameSerializer
 
 
 # List Categories API:
@@ -12,7 +12,7 @@ from .serializers import CategorySerializer
 @permission_classes([AllowAny])
 def listCategories(request):
     categories = Category.objects.all()
-    serializer = CategorySerializer(categories, many=True, fields=('id', 'name'))
+    serializer = CategoryNameSerializer(categories, many=True)
     return Response(serializer.data)
 
 
@@ -37,7 +37,7 @@ def createCategory(request):
     serializer = CategorySerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Category created successfully."}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -51,10 +51,10 @@ def updateCategory(request, id):
     except Category.DoesNotExist:
         return Response({"detail": "Category not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = CategorySerializer(category, data=request.data)
+    serializer = CategorySerializer(category, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data)
+        return Response({"detail": "Category updated successfully."}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
