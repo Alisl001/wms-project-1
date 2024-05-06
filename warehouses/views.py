@@ -65,3 +65,7 @@ def deleteWarehouse(request, id):
     warehouse = get_object_or_404(Warehouse, id=id)
     warehouse.delete()
     return Response({'detail': "Warehouse deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
