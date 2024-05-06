@@ -25,7 +25,7 @@ def createFavorite(request, product_id):
     serializer = FavoriteSerializer(data={'product': product_id})
     if serializer.is_valid():
         serializer.save(customer=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Product favorited successfully."}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
