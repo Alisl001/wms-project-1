@@ -5,18 +5,27 @@ from backend.models import Product, Supplier, Category
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
-        fields = ['name']
+        fields = ['id', 'name']
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['name']
+        fields = ['id', 'name']
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    supplier = SupplierSerializer()
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
+    supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
+
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'description', 'category', 'supplier', 'size', 'price', 'barcode', 'photo']
+
+
+class CustomProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
+    supplier = SupplierSerializer()
 
     class Meta:
         model = Product
@@ -33,6 +42,10 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 
 class ProductSearchSerializer(serializers.ModelSerializer):
+    supplier = SupplierSerializer()
+    category = CategorySerializer()
+
     class Meta:
         model = Product
-        fields = ['id', 'name', 'barcode', 'category', 'supplier', 'price']
+        fields = ['id', 'name', 'category', 'supplier', 'price', 'photo']
+

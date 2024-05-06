@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.response import Response
 from rest_framework import status
 from backend.models import Product
-from .serializers import ProductSerializer, ProductListSerializer, ProductSearchSerializer
+from .serializers import ProductSerializer, ProductListSerializer, ProductSearchSerializer, CustomProductSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from users.authentication import BearerTokenAuthentication
 from rest_framework import viewsets
@@ -62,7 +62,7 @@ def getProductInfo(request, id):
     except Product.DoesNotExist:
         return Response({"detail": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = ProductSerializer(product)
+    serializer = CustomProductSerializer(product)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -78,8 +78,7 @@ def listProducts(request):
 
 # List Products by Category API:
 @api_view(['GET'])
-@authentication_classes([BearerTokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def listProductsByCategory(request, category_id):
     products = Product.objects.filter(category_id=category_id)
     serializer = ProductListSerializer(products, many=True)
@@ -88,40 +87,41 @@ def listProductsByCategory(request, category_id):
 
 # List Products by Supplier API:
 @api_view(['GET'])
-@authentication_classes([BearerTokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def listProductsBySupplier(request, supplier_id):
     products = Product.objects.filter(supplier_id=supplier_id)
     serializer = ProductListSerializer(products, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# Product Search View Set:
-class ProductSearchViewSet(viewsets.ViewSet):
-    serializer_class = ProductSearchSerializer
+# Products Search API:
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def productSearch(request):
+    search_query = request.query_params.get('q', '')
+    sort_by = request.query_params.get('sort_by', 'name')
+    filter_by_category = request.query_params.get('category', None)
+    filter_by_supplier = request.query_params.get('supplier', None)
 
-    def list(self, request):
-        search_query = request.query_params.get('q', '')
-        sort_by = request.query_params.get('sort_by', 'name')
-        filter_by_category = request.query_params.get('category', None)
-        filter_by_supplier = request.query_params.get('supplier', None)
+    # Build filter conditions
+    filter_conditions = Q()
+    if filter_by_category:
+        filter_conditions &= Q(category__name__icontains=filter_by_category)
+    if filter_by_supplier:
+        filter_conditions &= Q(supplier__name__icontains=filter_by_supplier)
 
-        # Build filter conditions
-        filter_conditions = Q()
-        if filter_by_category:
-            filter_conditions &= Q(category__name__icontains=filter_by_category)
-        if filter_by_supplier:
-            filter_conditions &= Q(supplier__name__icontains=filter_by_supplier)
+    # Apply filtering and sorting
+    products = Product.objects.filter(
+        Q(name__icontains=search_query) |
+        Q(supplier__name__icontains=search_query) |
+        Q(category__name__icontains=search_query)
+    ).filter(filter_conditions).order_by(sort_by)
 
-        # Apply filtering and sorting
-        products = Product.objects.filter(
-            Q(name__icontains=search_query) |
-            Q(supplier__name__icontains=search_query) |
-            Q(category__name__icontains=search_query)
-        ).filter(filter_conditions).order_by(sort_by)
+    if not products:
+        return Response({"detail": "No products found."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = ProductSearchSerializer(products, many=True)
-        return Response(serializer.data)
+    serializer = ProductSearchSerializer(products, many=True)
+    return Response(serializer.data)
 
 
 # Upload Product Photo API:
@@ -160,8 +160,21 @@ def getProductDetailsByBarcode(request):
     except Product.DoesNotExist:
         return Response({"detail": "Product with the provided barcode not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = ProductSerializer(product)
+    serializer = CustomProductSerializer(product)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# Product name suggerstion in the search API:
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def productSuggestions(request):
+    search_query = request.query_params.get('q', '')
+
+    products = Product.objects.filter(name__icontains=search_query)
+
+    suggested_names = products.values_list('name', flat=True).distinct()
+
+    return Response(suggested_names)
 
 
 
