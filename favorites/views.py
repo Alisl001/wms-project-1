@@ -65,13 +65,15 @@ def topFavoriteProducts(request):
     
     # Retrieve the name of each product
     product_names = {}
+    product_photos = {}
     for item in top_products:
         product_id = item['product']
         product = Product.objects.filter(pk=product_id).first()
         product_names[product_id] = product.name if product else None
+        product_photos[product_id] = product.photo if product else None
 
     # Construct the response data with product name included
-    data = [{'product_id': item['product'], 'product_name': product_names.get(item['product'], 'Unknown'), 'favorite_count': item['favorite_count']} for item in top_products]
+    data = [{'product_id': item['product'], 'product_name': product_names.get(item['product'], 'Unknown'), 'product_photo': product_photos.get(item['product'], 'Unknown'), 'favorite_count': item['favorite_count']} for item in top_products]
     
     return Response(data)
 

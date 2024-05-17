@@ -13,7 +13,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name']
+        fields = ['id', 'name','photo','price']
 
 
 class MyFavoriteSerializer(serializers.ModelSerializer):
