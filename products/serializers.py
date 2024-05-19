@@ -5,13 +5,13 @@ from backend.models import Product, Supplier, Category
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
-        fields = ['id', 'name']
+        fields = ['id', 'name','photo']
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name','description']
 
 
 class ProductSerializer(serializers.ModelSerializer):
