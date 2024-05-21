@@ -11,15 +11,16 @@ from warehouses.serializers import WarehouseSerializer
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-    role = serializers.CharField(write_only=True)
+    role = serializers.CharField(write_only=True, required=False)
+    warehouse_id = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'email', 'password', 'confirm_password', 'role')
+        fields = ('first_name', 'last_name', 'username', 'email', 'password', 'confirm_password', 'role', 'warehouse_id')
         extra_kwargs = {
             'password': {'write_only': True}
         }
-    
+
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with that email already exists.")
@@ -32,12 +33,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        role = validated_data.pop('role')
+        role = validated_data.pop('role', 'customer')
+        warehouse_id = validated_data.pop('warehouse_id', None)
         user = User.objects.create_user(
             **validated_data,
             is_staff=(role == 'staff' or role == 'admin'),
-            is_superuser=(role == 'admin'), 
+            is_superuser=(role == 'admin'),
         )
+        if warehouse_id and role == 'staff':
+            warehouse = Warehouse.objects.get(id=warehouse_id)
+            StaffPermission.objects.create(user=user, warehouse=warehouse, is_permitted=True)
         return user
 
 
@@ -151,19 +156,19 @@ class UserInfoUpdateSerializer(serializers.ModelSerializer):
         return data
 
 
-class StaffPermissionSerializer(serializers.ModelSerializer):
-    warehouse_id = serializers.IntegerField()
+# class StaffPermissionSerializer(serializers.ModelSerializer):
+#     warehouse_id = serializers.IntegerField()
 
-    class Meta:
-        model = StaffPermission
-        fields = ['warehouse_id']
+#     class Meta:
+#         model = StaffPermission
+#         fields = ['warehouse_id']
 
-    def validate(self, data):
-        if 'warehouse_id' not in data:
-            raise serializers.ValidationError("Warehouse ID is required.")
+#     def validate(self, data):
+#         if 'warehouse_id' not in data:
+#             raise serializers.ValidationError("Warehouse ID is required.")
         
-        user = self.context['request'].user
-        if not user.is_staff:
-            raise serializers.ValidationError("Only staff members can be assigned permissions.")
+#         user = self.context['request'].user
+#         if not user.is_staff:
+#             raise serializers.ValidationError("Only staff members can be assigned permissions.")
         
-        return data
+#         return data

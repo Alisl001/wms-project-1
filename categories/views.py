@@ -72,3 +72,25 @@ def deleteCategory(request, id):
     return Response({"detail": "Category deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
+
+# Upload Category Photo API:
+@api_view(['POST'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAdminUser])
+def uploadCategoryPhoto(request, id):
+    try:
+        category = Category.objects.get(pk=id)
+    except Category.DoesNotExist:
+        return Response({"detail": "Category not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if a photo is included in the request
+    if 'photo' not in request.FILES:
+        return Response({"detail": "No photo provided in the request"}, status=status.HTTP_400_BAD_REQUEST)
+
+    photo = request.FILES['photo']
+    category.photo = photo
+    category.save()
+
+    return Response({"detail": "Photo uploaded successfully"}, status=status.HTTP_200_OK)
+
+

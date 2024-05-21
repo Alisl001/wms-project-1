@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.authentication import BearerTokenAuthentication
-from .serializers import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer, StaffSerializer, UserInfoUpdateSerializer, StaffPermissionSerializer
+from .serializers import UserRegistrationSerializer, CustomAuthTokenSerializer, UserLoginResponseSerializer, CustomUserSerializer, StaffSerializer, UserInfoUpdateSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -15,6 +15,8 @@ from django.utils import timezone
 from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import Permission
+from django.db import IntegrityError
 
 
 #Register API
@@ -280,11 +282,11 @@ def updateUserInfo(request):
 @api_view(['DELETE'])
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
-def deleteUserById(request, id):
+def disableUserById(request, id):
     try:
         user = User.objects.get(pk=id)
-        user.delete()
-        return Response({"detail": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        user.is_active = False
+        return Response({"detail": "User disabled successfully"}, status=status.HTTP_204_NO_CONTENT)
     except User.DoesNotExist:
         return Response({"detail": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
@@ -292,25 +294,26 @@ def deleteUserById(request, id):
 
 
 
-# Delete user their own account API
+# Disable user their own account API
 @api_view(['DELETE'])
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAuthenticated])
-def deleteMyAccount(request):
+def disableMyAccount(request):
     user = request.user
     data = request.data
     provided_password = data.get('password', '')
 
     # Check if the provided password matches the user's password
-    if not check_password(provided_password, user.password):
+    if not user.check_password(provided_password):
         return Response({'detail': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        user.delete()
+        user.is_active = False
+        user.save()
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
-    return Response({'detail': 'User account deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    return Response({'detail': 'User account disabled successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 
 
@@ -364,23 +367,43 @@ def handle_not_found_error(error_message):
     return Response({'detail': error_message}, status=status.HTTP_404_NOT_FOUND)
 
 
-# Give permission to the new staff member API
+# Staff Registere by admin API:
 @api_view(['POST'])
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
-def assignStaffPermission(request, staff_id):
-    staff_member = get_object_or_404(User, id=staff_id, is_staff=True)
+def registerStaffByAdmin(request):
+    data = request.data
+    warehouse_id = data.get('warehouse_id')
 
-    serializer = StaffPermissionSerializer(data=request.data, context={'request': request})
+    if not warehouse_id:
+        return Response({'detail': 'Warehouse ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = UserRegistrationSerializer(data=data)
     if serializer.is_valid():
-        warehouse_id = serializer.validated_data.get('warehouse_id')
+        user = serializer.save()
+        user.is_staff = True
+        user.save()
 
+        # Assign warehouse and permissions
         warehouse = get_object_or_404(Warehouse, id=warehouse_id)
 
-        staff_permission, created = StaffPermission.objects.get_or_create(user=staff_member, warehouse=warehouse)
-        staff_permission.is_permitted = True
-        staff_permission.save()
+        # Check if the permission already exists
+        if not StaffPermission.objects.filter(user=user, warehouse=warehouse).exists():
+            StaffPermission.objects.create(user=user, warehouse=warehouse, is_permitted=True)
+        else:
+            # If permissions already exist, continue without error
+            pass
+        
+        assignDefaultPermissions(user)
 
-        return Response({'detail': 'Permission assigned successfully.'}, status=status.HTTP_201_CREATED)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Staff registered successfully.'}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def assignDefaultPermissions(user):
+    permissions = Permission.objects.filter(codename__in=['add_item', 'change_item', 'view_item'])
+    user.user_permissions.set(permissions)
+
+
+
+
+

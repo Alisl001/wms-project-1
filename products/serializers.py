@@ -5,13 +5,13 @@ from backend.models import Product, Supplier, Category
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
-        fields = ['id', 'name','photo']
+        fields = '__all__'
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name','description']
+        fields = '__all__'
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'supplier', 'size', 'price', 'barcode', 'photo']
+        fields = '__all__'
 
 
 class CustomProductSerializer(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class CustomProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'category', 'supplier', 'size', 'price', 'barcode', 'photo']
+        fields = '__all__'
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -38,7 +38,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'barcode', 'category', 'supplier', 'price', 'photo']
+        fields = '__all__'
 
 
 class ProductSearchSerializer(serializers.ModelSerializer):
@@ -47,5 +47,5 @@ class ProductSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'category', 'supplier', 'price', 'photo']
+        fields = '__all__'
 
