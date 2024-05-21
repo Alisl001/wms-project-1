@@ -4,10 +4,10 @@ from backend.models import Category
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'description']
+        fields = '__all__'
 
 
 class CategoryNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name','description']
+        fields = '__all__'
