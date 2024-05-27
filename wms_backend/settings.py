@@ -45,6 +45,11 @@ INSTALLED_APPS = [
     'backend',
     'users',
     'warehouses',
+    'locations',
+    'categories',
+    'favorites',
+    'products',
+    'suppliers',
 
 
 ]

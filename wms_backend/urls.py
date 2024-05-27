@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from users.views import userRegistration, userAuthTokenLogin, userLogout, passwordResetRequest, passwordResetCodeCheck, passwordResetConfirm, retrieveUserById, myDetails, changeMyPassword, updateUserInfo, disableMyAccount, disableUserById, listStaffMembers, listNewStaffMembers, listCustomers, registerStaffByAdmin
 from warehouses.views import createWarehouse, updateWarehouse, deleteWarehouse, listWarehouses
+from locations.views import createLocation, updateLocation, deleteLocation, listLocations, locationInfo
 from suppliers.views import listSuppliers, supplierInfo, createSupplier, updateSupplier, deleteSupplier, uploadSupplierPhoto
 from categories.views import listCategories, categoryInfo, createCategory, updateCategory, deleteCategory, uploadCategoryPhoto
 from products.views import createProduct, updateProduct, deleteProduct, getProductInfo, listProducts, listProductsByCategory, listProductsBySupplier, productSearch, uploadProductPhoto, getProductDetailsByBarcode, productSuggestions
@@ -39,6 +40,13 @@ urlpatterns = [
     path('api/warehouse/update/<int:id>/', updateWarehouse, name='updateWarehouse'),
     path('api/warehouse/delete/<int:id>/', deleteWarehouse, name='deleteWarehouse'),
     path('api/warehouses/', listWarehouses, name='listWarehouses'),
+
+    # Locations CRUD APIs
+    path('api/locations/', listLocations, name='listLocations'),
+    path('api/locations/<int:id>/', locationInfo, name='locationInfo'),
+    path('api/locations/create/', createLocation, name='createLocation'),
+    path('api/locations/update/<int:id>/', updateLocation, name='updateLocation'),
+    path('api/locations/delete/<int:id>/', deleteLocation, name='deleteLocation'),
 
     # Suppliers management APIs
     path('api/suppliers/', listSuppliers, name='listSuppliers'),
