@@ -10,6 +10,8 @@ from suppliers.views import listSuppliers, supplierInfo, createSupplier, updateS
 from categories.views import listCategories, categoryInfo, createCategory, updateCategory, deleteCategory, uploadCategoryPhoto
 from products.views import createProduct, updateProduct, deleteProduct, getProductInfo, listProducts, listProductsByCategory, listProductsBySupplier, productSearch, uploadProductPhoto, getProductDetailsByBarcode, productSuggestions
 from favorites.views import createFavorite, deleteFavorite, myFavorites, topFavoriteProducts, productFavoritedByUsers, userFavoriteCount
+from inventory.views import createInventory, updateInventory, deleteInventory, listInventory,inventoryInfo
+from shipments.views import createShipment, updateShipment, deleteShipment,listShipments, shipmentInfo, receiveProduct, shipmentDetails
 
 
 
@@ -84,6 +86,23 @@ urlpatterns = [
     path('api/products/my-favorites/', myFavorites, name='myFavorites'),
     path('api/products/top-10-favorite/', topFavoriteProducts, name='topFavoriteProducts'),
     path('api/users/<int:user_id>/favorites-count/', userFavoriteCount, name='userFavoriteCount'),
+
+    # Shipment management APIs
+    path('api/shipments/', listShipments, name='listShipments'),
+    path('api/shipments/<int:id>/', shipmentInfo, name='shipmentInfo'),
+    path('api/shipments/create/', createShipment, name='createShipment'),
+    path('api/shipments/update/<int:id>/', updateShipment, name='updateShipment'),
+    path('api/shipments/delete/<int:id>/', deleteShipment, name='deleteShipment'),
+    path('api/shipments/receive/<int:shipment_id>/<str:barcode>/', receiveProduct, name='receiveProduct'),
+    path('shipments/details/<int:shipment_id>/', shipmentDetails, name='shipmentDetails'),
+
+    # Inventory management APIs
+    path('api/inventory/', listInventory, name='listInventory'),
+    path('api/inventory/<int:id>/', inventoryInfo, name='inventoryInfo'),
+    path('api/inventory/create/', createInventory, name='createInventory'),
+    path('api/inventory/update/<int:id>/', updateInventory, name='updateInventory'),
+    path('api/inventory/delete/<int:id>/', deleteInventory, name='deleteInventory'),
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

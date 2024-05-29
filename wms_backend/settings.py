@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'favorites',
     'products',
     'suppliers',
+    'shipments',
+    'inventory',
 
 
 ]

@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -67,24 +68,24 @@ class Inventory(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     location = models.ForeignKey('Location', on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    expiry_date = models.DateField()
+    expiry_date = models.DateField(blank=True, null=True)
     status_choices = [
         ('available', 'Available'),
         ('nearly_expiring', 'Nearly Expiring'),
         ('expired', 'Expired'),
     ]
-    status = models.CharField(max_length=20, choices=status_choices)
+    status = models.CharField(max_length=20, choices=status_choices, default='available')
 
 # 8. Shipment model:
 class Shipment(models.Model):
     supplier = models.ForeignKey('Supplier', on_delete=models.CASCADE)
     arrival_date = models.DateField()
-    receive_date = models.DateField()
+    receive_date = models.DateField(blank=True, null=True)
     status_choices = [
         ('pending', 'Pending'),
         ('received', 'Received'),
     ]
-    status = models.CharField(max_length=20, choices=status_choices)
+    status = models.CharField(max_length=20, choices=status_choices, default='pending')
     
     def __str__(self):
         return f"Shipment from {self.supplier.name} - Status: {self.status}"
@@ -101,7 +102,7 @@ class ShipmentDetail(models.Model):
         ('received', 'Received'),
         ('put_away', 'Put Away'),
     ]
-    status = models.CharField(max_length=20, choices=status_choices)
+    status = models.CharField(max_length=20, choices=status_choices, default='pending')
     
     def __str__(self):
         return f"Detail {self.id} of Shipment {self.shipment.id} - Product: {self.product.name}"
@@ -116,7 +117,7 @@ class Order(models.Model):
         ('high', 'High'),
         ('low', 'Low'),
     ]
-    priority = models.CharField(max_length=20, choices=priority_choices)
+    priority = models.CharField(max_length=20, choices=priority_choices, default='low')
     status_choices = [
         ('pending', 'Pending'),
         ('picked', 'Picked'),
@@ -124,7 +125,7 @@ class Order(models.Model):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
     ]
-    status = models.CharField(max_length=20, choices=status_choices)
+    status = models.CharField(max_length=20, choices=status_choices, default='pending')
     
     def __str__(self):
         return f"Order {self.id} by {self.customer.username} - Total: ${self.total_price}"
@@ -142,7 +143,7 @@ class OrderDetail(models.Model):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
     ]
-    status = models.CharField(max_length=20, choices=status_choices)
+    status = models.CharField(max_length=20, choices=status_choices, default='pending')
 
 # 12. Activity model:
 class Activity(models.Model):
@@ -194,7 +195,7 @@ class Notification(models.Model):
         ('unread', 'Unread'),
         ('read', 'Read'),
     ]
-    status = models.CharField(max_length=20, choices=status_choices)
+    status = models.CharField(max_length=20, choices=status_choices, default='unread')
 
 # 16. BarcodeScanning model:
 class BarcodeScanning(models.Model):
@@ -298,4 +299,5 @@ class ReplenishmentRequest(models.Model):
         ('rejected', 'Rejected'),
     ]
     status = models.CharField(max_length=20, choices=status_choices, default='pending')
+    reason = models.TextField(null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
