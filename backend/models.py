@@ -71,7 +71,7 @@ class Inventory(models.Model):
     expiry_date = models.DateField(blank=True, null=True)
     status_choices = [
         ('available', 'Available'),
-        ('nearly_expiring', 'Nearly Expiring'),
+        ('out_of_stock', 'Out Of Stock'),
         ('expired', 'Expired'),
     ]
     status = models.CharField(max_length=20, choices=status_choices, default='available')

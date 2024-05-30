@@ -94,7 +94,7 @@ urlpatterns = [
     path('api/shipments/update/<int:id>/', updateShipment, name='updateShipment'),
     path('api/shipments/delete/<int:id>/', deleteShipment, name='deleteShipment'),
     path('api/shipments/receive/<int:shipment_id>/<str:barcode>/', receiveProduct, name='receiveProduct'),
-    path('shipments/details/<int:shipment_id>/', shipmentDetails, name='shipmentDetails'),
+    path('api/shipments/details/<int:shipment_id>/', shipmentDetails, name='shipmentDetails'),
 
     # Inventory management APIs
     path('api/inventory/', listInventory, name='listInventory'),
