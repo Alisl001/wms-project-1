@@ -84,6 +84,8 @@ class Shipment(models.Model):
     status_choices = [
         ('pending', 'Pending'),
         ('received', 'Received'),
+        ('put_away', 'Put Away'),
+
     ]
     status = models.CharField(max_length=20, choices=status_choices, default='pending')
     

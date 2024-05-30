@@ -12,7 +12,7 @@ from products.views import createProduct, updateProduct, deleteProduct, getProdu
 from favorites.views import createFavorite, deleteFavorite, myFavorites, topFavoriteProducts, productFavoritedByUsers, userFavoriteCount
 from inventory.views import createInventory, updateInventory, deleteInventory, listInventory,inventoryInfo
 from shipments.views import createShipment, updateShipment, deleteShipment,listShipments, shipmentInfo, receiveProduct, shipmentDetails
-
+from putaway.views import suggestLocations, browseReceivedProducts, putAwayProduct
 
 
 
@@ -71,7 +71,7 @@ urlpatterns = [
     path('api/products/<int:id>/update/', updateProduct, name='updateProduct'),
     path('api/products/<int:id>/delete/', deleteProduct, name='deleteProduct'),
     path('api/products/<int:id>/', getProductInfo, name='getProductInfo'),
-    path('api/products/details/barcode/', getProductDetailsByBarcode, name='getProductInfo'),
+    path('api/products/<str:barcode>/details/', getProductDetailsByBarcode, name='getProductInfo'),
     path('api/products/', listProducts, name='listProducts'),
     path('api/products/category/<int:category_id>/', listProductsByCategory, name='listProductsByCategory'),
     path('api/products/supplier/<int:supplier_id>/', listProductsBySupplier, name='listProductsBySupplier'),
@@ -102,6 +102,11 @@ urlpatterns = [
     path('api/inventory/create/', createInventory, name='createInventory'),
     path('api/inventory/update/<int:id>/', updateInventory, name='updateInventory'),
     path('api/inventory/delete/<int:id>/', deleteInventory, name='deleteInventory'),
+
+    # Put Away APIs
+    path('api/shipments/products/received/', browseReceivedProducts, name='receivedProducts'),
+    path('api/shipments/details/<int:shipment_detail_id>/suggest-locations/', suggestLocations, name='suggestLocations'),
+    path('api/shipments/products/put-away/', putAwayProduct, name='putAwayProduct'),
 
 
 

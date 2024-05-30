@@ -146,15 +146,9 @@ def uploadProductPhoto(request, id):
 
 
 # Product Details By Barcode API:
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([AllowAny])
-def getProductDetailsByBarcode(request):
-
-    if 'barcode' not in request.data:
-        return Response({"detail": "Barcode not provided in the request"}, status=status.HTTP_400_BAD_REQUEST)
-
-    barcode = request.data['barcode']
-
+def getProductDetailsByBarcode(request, barcode):
     try:
         product = Product.objects.get(barcode=barcode)
     except Product.DoesNotExist:
@@ -162,7 +156,6 @@ def getProductDetailsByBarcode(request):
 
     serializer = CustomProductSerializer(product)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 # Product name suggerstion in the search API:
 @api_view(['GET'])

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'suppliers',
     'shipments',
     'inventory',
+    'putaway',
 
 
 ]
