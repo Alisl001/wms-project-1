@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from users.authentication import BearerTokenAuthentication
-from .models import Activity
+from backend.models import Activity
 from .serializers import ActivitySerializer
 
 
