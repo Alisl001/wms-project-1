@@ -13,6 +13,8 @@ from favorites.views import createFavorite, deleteFavorite, myFavorites, topFavo
 from inventory.views import createInventory, updateInventory, deleteInventory, listInventory,inventoryInfo
 from shipments.views import createShipment, updateShipment, deleteShipment,listShipments, shipmentInfo, receiveProduct, shipmentDetails
 from putaway.views import suggestLocations, browseReceivedProducts, putAwayProduct
+from orders.views import createOrder, updateOrder, cancelOrder, viewOrderStatus, getOrderDetails, viewMyOrders, listOrders, prioritizeOrder, updateOrderStatus, getPickList, pickProduct, packOrder, listPackedOrders, assignOrdersToDeliveryMan
+from activities.views import listActivities
 
 
 
@@ -96,6 +98,9 @@ urlpatterns = [
     path('api/shipments/receive/<int:shipment_id>/<str:barcode>/', receiveProduct, name='receiveProduct'),
     path('api/shipments/details/<int:shipment_id>/', shipmentDetails, name='shipmentDetails'),
 
+    # Activities management API
+    path('api/activities/', listActivities, name='listActivities'),
+
     # Inventory management APIs
     path('api/inventory/', listInventory, name='listInventory'),
     path('api/inventory/<int:id>/', inventoryInfo, name='inventoryInfo'),
@@ -108,6 +113,21 @@ urlpatterns = [
     path('api/shipments/details/<int:shipment_detail_id>/suggest-locations/', suggestLocations, name='suggestLocations'),
     path('api/shipments/products/put-away/', putAwayProduct, name='putAwayProduct'),
 
+    # Orders management APIs
+    path('api/orders/create/', createOrder, name='createOrder'),
+    path('api/orders/update/<int:order_id>/', updateOrder, name='updateOrder'),
+    path('api/orders/cancel/<int:order_id>/', cancelOrder, name='cancelOrder'),
+    path('api/orders/status/<int:order_id>/', viewOrderStatus, name='viewOrderStatus'),
+    path('api/orders/details/<int:order_id>/', getOrderDetails, name='getOrderDetails'),
+    path('api/orders/my-orders/', viewMyOrders, name='viewMyOrders'),
+    path('api/orders/list-all/', listOrders, name='listOrders'),
+    path('api/orders/prioritize/<int:order_id>/', prioritizeOrder, name='prioritizeOrder'),
+    path('api/orders/update-status/<int:order_id>/', updateOrderStatus, name='updateOrderStatus'),
+    path('api/orders/pick-list/<int:order_detail_id>/', getPickList, name='getPickList'),
+    path('api/orders/pick/<int:order_detail_id>/<str:location_barcode>/', pickProduct, name='pickProduct'),
+    path('api/orders/pack/<int:order_id>/', packOrder, name='packOrder'),
+    path('api/orders/packed/', listPackedOrders, name='listPackedOrders'),
+    path('api/orders/assign-delivery-man/', assignOrdersToDeliveryMan, name='assignOrdersToDeliveryMan'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
