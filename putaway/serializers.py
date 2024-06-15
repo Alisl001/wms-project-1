@@ -1,9 +1,10 @@
+from itertools import product
 from rest_framework import serializers
 from backend.models import ShipmentDetail, Inventory, Location, Product
 
-class ShipmentDetailSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ShipmentDetail
+        model = Product
         fields = '__all__'
 
 class InventorySerializer(serializers.ModelSerializer):
@@ -16,7 +17,8 @@ class LocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = '__all__'
 
-class ProductSerializer(serializers.ModelSerializer):
+class ShipmentDetailSerializer(serializers.ModelSerializer):
+    product=ProductSerializer()
     class Meta:
-        model = Product
+        model = ShipmentDetail
         fields = '__all__'

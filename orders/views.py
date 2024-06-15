@@ -28,9 +28,20 @@ def createOrder(request):
     data = request.data.copy()
     data['customer'] = request.user.id
 
+    # Calculate the total price
+    try:
+        products_data = data.get('products', [])
+        total_price = sum(Product.objects.get(id=item['product']).price * item['quantity'] for item in products_data)
+    except Product.DoesNotExist:
+        return Response({"detail": "One or more products not found"}, status=status.HTTP_400_BAD_REQUEST)
+    except KeyError:
+        return Response({"detail": "Invalid product data"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Add the calculated total_price to the data
+    data['total_price'] = total_price
+
     serializer = OrderSerializer(data=data)
     if serializer.is_valid():
-        products_data = data.get('products')
         if products_data:
             product_ids = [product['product'] for product in products_data]
             total_quantity_needed = sum(product['quantity'] for product in products_data)
@@ -47,7 +58,6 @@ def createOrder(request):
                 product_quantity_in_inventory = Inventory.objects.filter(product=product).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
                 if product_quantity_in_inventory - pending_orders_quantity - product_data['quantity'] < 0:
                     return Response({"detail": f"Not enough quantity available for product {product.name}"}, status=status.HTTP_400_BAD_REQUEST)
-            total_price = sum(item['product'].price * item['quantity'] for item in data['products'])
 
             try:
                 wallet = Wallet.objects.get(customer=request.user)
@@ -58,21 +68,36 @@ def createOrder(request):
             if wallet.balance < total_price:
                 return Response({"detail": "Insufficient funds in the wallet"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Deduct the total order amount from the wallet balance
-            wallet.balance -= total_price
-            wallet.save()
+        # Create the order without products data
+        validated_data = serializer.validated_data
+        validated_data.pop('products', None)  # Remove products from validated_data if it's already there
+        order = Order.objects.create(**validated_data)
 
-            # Create a transaction log entry for the deduction
-            TransactionLog.objects.create(
-                customer=request.user,
-                amount=total_price,
-                transaction_type='purchase',
-                description='Deducted funds for order'
+        # Add products to the order
+        for product_data in products_data:
+            product = Product.objects.get(id=product_data['product'])
+            OrderDetail.objects.create(
+                order=order,
+                product=product,
+                quantity=product_data['quantity'],
+                price_at_sale=product.price,
+                status='pending'
             )
 
-        order = serializer.save()
+        # Deduct the total order amount from the wallet balance and save the wallet
+        wallet.balance -= total_price
+        wallet.save()
+
+        # Create a transaction log entry for the deduction
+        TransactionLog.objects.create(
+            customer=request.user,
+            amount=total_price,
+            transaction_type='purchase',
+            description='Deducted funds for order'
+        )
+
         send_notification_to_admin(f"New order created: Order ID {order.id}")
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Order created successfully"}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -91,34 +116,28 @@ def updateOrder(request, order_id):
 
     serializer = OrderSerializer(order, data=data, partial=True)
     if serializer.is_valid():
-        products_data = data.get('products')
-        if products_data:
-            product_ids = [product['product'] for product in products_data]
-            total_quantity_needed = sum(product['quantity'] for product in products_data)
-            
-            # Calculate the total quantity of products in pending orders
-            pending_orders_quantity = OrderDetail.objects.filter(
-                order__status='pending',
-                product__id__in=product_ids
-            ).exclude(order=order).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
+        products_data = data.get('products', [])
 
-            # Check the availability of products in inventory
+        # Calculate new total price and check product availability
+        total_price = 0
+        try:
             for product_data in products_data:
                 product = Product.objects.get(id=product_data['product'])
+                total_price += product.price * product_data['quantity']
+
+                # Check product availability in inventory
                 product_quantity_in_inventory = Inventory.objects.filter(product=product).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
+                pending_orders_quantity = OrderDetail.objects.filter(order__status='pending', product=product).exclude(order=order).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
+
                 if product_quantity_in_inventory - pending_orders_quantity - product_data['quantity'] < 0:
                     return Response({"detail": f"Not enough quantity available for product {product.name}"}, status=status.HTTP_400_BAD_REQUEST)
+        except Product.DoesNotExist:
+            return Response({"detail": "One or more products not found"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Remove existing order details
         OrderDetail.objects.filter(order=order).delete()
 
-        total_price = 0
-
-        # Calculate total price and set price_at_sale from the product's current price
-        for product_data in products_data:
-            product = Product.objects.get(id=product_data['product'])
-            total_price += product.price * product_data['quantity']
-
+        # Update order total price
         order.total_price = total_price
         order.save()
 
@@ -142,6 +161,7 @@ def updateOrder(request, order_id):
             description='Updated funds for order'
         )
 
+        # Create new order details
         for product_data in products_data:
             product = Product.objects.get(id=product_data['product'])
             OrderDetail.objects.create(
@@ -153,9 +173,9 @@ def updateOrder(request, order_id):
             )
         
         send_notification_to_admin(f"Order updated: Order ID {order.id}")
-        return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
+        return Response({"detail": "Order updated successfully"}, status=status.HTTP_200_OK)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 # Cancel Order API
@@ -318,7 +338,8 @@ def getPickList(request, order_detail_id):
         quantity__gt=0,
         status='available'
     ).annotate(
-        capacity_left=F('location__capacity') - F('quantity')
+        capacity_left=F('location__capacity') - F('quantity'),
+        barcode=F('location__barcode')
     ).order_by('capacity_left')[:3]
 
     if not locations.exists():
@@ -333,6 +354,7 @@ def getPickList(request, order_detail_id):
             "rack": location.location.rack,
             "level": location.location.level,
             "quantity": location.quantity,
+            "barcode": location.barcode,
             "capacity_left": location.capacity_left
         }
         for location in locations
@@ -385,7 +407,7 @@ def pickProduct(request, order_detail_id, location_barcode):
     StockMovement.objects.create(
         product=order_detail.product,
         from_location=location,
-        to_location=None,  # Adjust this if you have a specific to_location for picking
+        to_location=None,  
         quantity=quantity_to_pick,
         movement_type='pick'
     )
@@ -470,6 +492,7 @@ def packOrder(request, order_id):
 
 # List Packed Orders API
 @api_view(['GET'])
+@authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAuthenticated])
 def listPackedOrders(request):
     packed_orders = Order.objects.filter(status='packed')
@@ -494,6 +517,8 @@ def assignOrdersToDeliveryMan(request):
 
     # Update order status to delivered
     for order in orders:
+        if order.status == 'cancelled':
+            return Response({"detail": "Some orders has been cancelled"}, status=status.HTTP_400_BAD_REQUEST)
         order.status = 'delivered'
         order.save()
 

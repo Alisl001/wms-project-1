@@ -246,7 +246,7 @@ class TransactionLog(models.Model):
 class StockMovement(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     from_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name='from_location')
-    to_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name='to_location')
+    to_location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name='to_location', null=True, blank=True)
     quantity = models.IntegerField()
     movement_type_choices = [
         ('put_away', 'Put Away'),

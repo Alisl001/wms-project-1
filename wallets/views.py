@@ -14,13 +14,14 @@ from decimal import Decimal
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAuthenticated])
 def viewWallet(request):
-    wallet = Wallet.objects.get_or_create(customer=request.user)
+    wallet, created = Wallet.objects.get_or_create(customer=request.user)
     serializer = WalletSerializer(wallet)
     return Response(serializer.data)
 
 
 # List Wallets API
 @api_view(['GET'])
+@authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
 def listWallets(request):
     wallets = Wallet.objects.all()

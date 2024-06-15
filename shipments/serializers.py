@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from backend.models import Shipment, ShipmentDetail, Product
 
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -9,23 +8,18 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ShipmentDetailSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
+
     class Meta:
         model = ShipmentDetail
-        fields = '__all__'
+        fields = ['id', 'shipment', 'product', 'price_at_shipment', 'quantity', 'status']
 
 class ShipmentSerializer(serializers.ModelSerializer):
-    details = ShipmentDetailSerializer(many=True, source='shipmentdetail_set')
+    details = ShipmentDetailSerializer(many=True, read_only=True)
 
     class Meta:
         model = Shipment
-        fields = '__all__'
-
-    def create(self, validated_data):
-        details_data = validated_data.pop('details')
-        shipment = Shipment.objects.create(**validated_data)
-        for detail_data in details_data:
-            ShipmentDetail.objects.create(shipment=shipment, **detail_data)
-        return shipment
-
-
-
+        fields = ['supplier', 'arrival_date', 'receive_date', 'status', 'details']
+        extra_kwargs = {
+            'receive_date': {'required': False},
+            'status': {'required': False, 'default': 'pending'}
+        }
