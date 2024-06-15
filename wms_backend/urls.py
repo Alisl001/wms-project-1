@@ -11,11 +11,11 @@ from categories.views import listCategories, categoryInfo, createCategory, updat
 from products.views import createProduct, updateProduct, deleteProduct, getProductInfo, listProducts, listProductsByCategory, listProductsBySupplier, productSearch, uploadProductPhoto, getProductDetailsByBarcode, productSuggestions
 from favorites.views import createFavorite, deleteFavorite, myFavorites, topFavoriteProducts, productFavoritedByUsers, userFavoriteCount
 from inventory.views import createInventory, updateInventory, deleteInventory, listInventory,inventoryInfo
-from shipments.views import createShipment, updateShipment, deleteShipment,listShipments, shipmentInfo, receiveProduct, shipmentDetails
+from shipments.views import createShipment, updateShipment, deleteShipment, listShipments, shipmentInfo, receiveProduct, shipmentDetails
 from putaway.views import suggestLocations, browseReceivedProducts, putAwayProduct
 from orders.views import createOrder, updateOrder, cancelOrder, viewOrderStatus, getOrderDetails, viewMyOrders, listOrders, prioritizeOrder, updateOrderStatus, getPickList, pickProduct, packOrder, listPackedOrders, assignOrdersToDeliveryMan
 from activities.views import listActivities
-
+from wallets.views import listWallets, myTransactionLog, viewWallet, addFunds
 
 
 urlpatterns = [
@@ -128,6 +128,12 @@ urlpatterns = [
     path('api/orders/pack/<int:order_id>/', packOrder, name='packOrder'),
     path('api/orders/packed/', listPackedOrders, name='listPackedOrders'),
     path('api/orders/assign-delivery-man/', assignOrdersToDeliveryMan, name='assignOrdersToDeliveryMan'),
+
+    # Wallets management API
+    path('api/wallets/my-wallet/', viewWallet, name='viewWallet'),
+    path('api/wallets/', listWallets, name='listWallets'),
+    path('api/wallets/add-funds/', addFunds, name='addFunds'),
+    path('api/wallets/my-transactions/', myTransactionLog, name='myTransactions'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

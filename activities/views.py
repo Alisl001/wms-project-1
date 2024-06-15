@@ -11,7 +11,7 @@ from .serializers import ActivitySerializer
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
 def listActivities(request):
-    activities = Activity.objects.all()
+    activities = Activity.objects.order_by('-timestamp')
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
