@@ -22,6 +22,18 @@ class ShipmentDetailSerializer(serializers.ModelSerializer):
 
 class ShipmentSerializer(serializers.ModelSerializer):
     details = ShipmentDetailSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Shipment
+        fields = ['id', 'supplier', 'arrival_date', 'receive_date', 'status', 'details']
+        extra_kwargs = {
+            'receive_date': {'required': False},
+            'status': {'required': False, 'default': 'pending'}
+        }
+
+
+class ListShipmentSerializer(serializers.ModelSerializer):
+    details = ShipmentDetailSerializer(many=True, read_only=True)
     supplier = SupplierSerializer()
 
     class Meta:

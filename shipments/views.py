@@ -4,10 +4,12 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from backend.models import Shipment, ShipmentDetail, Product, Inventory, Activity
-from .serializers import ShipmentSerializer, ShipmentDetailSerializer
+from .serializers import ShipmentSerializer, ShipmentDetailSerializer, ListShipmentSerializer
 from users.authentication import BearerTokenAuthentication
 from users.permissions import IsStaffUser
 from datetime import datetime
+from django.db.models import Case, When, IntegerField
+from django.db import models
 
 
 # Create Shipment API
@@ -56,8 +58,15 @@ def createShipment(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def listShipments(request):
-    shipments = Shipment.objects.all().order_by('-status')
-    serializer = ShipmentSerializer(shipments, many=True)
+    shipments = Shipment.objects.all().order_by(
+        Case(When(status='pending', then=0),
+            When(status='received', then=1),
+            When(status='put_away', then=2),
+            default=3,
+            output_field=models.IntegerField()
+        )
+    )
+    serializer = ListShipmentSerializer(shipments, many=True)
     return Response(serializer.data)
 
 
