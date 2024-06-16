@@ -14,7 +14,6 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 class ShipmentDetailSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
-    supplier = SupplierSerializer()
 
     class Meta:
         model = ShipmentDetail
