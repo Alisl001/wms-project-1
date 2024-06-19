@@ -555,3 +555,4 @@ def assignOrdersToDeliveryMan(request):
     return Response({"detail": "Orders assigned to delivery man successfully"}, status=status.HTTP_200_OK)
 
 
+
