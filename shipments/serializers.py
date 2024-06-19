@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from backend.models import Shipment, ShipmentDetail, Product, Supplier
-import suppliers
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,7 +28,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
             'receive_date': {'required': False},
             'status': {'required': False, 'default': 'pending'}
         }
-
 
 class ListShipmentSerializer(serializers.ModelSerializer):
     details = ShipmentDetailSerializer(many=True, read_only=True)
