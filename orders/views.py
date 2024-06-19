@@ -208,7 +208,7 @@ def cancelOrder(request, order_id):
 
     # Update the order status to 'cancelled'
     order.status = 'cancelled'
-    order.updated_at_at = datetime.now().date()
+    order.updated_at = datetime.now().date()
     order.save()
 
     send_notification_to_admin(f"Order cancelled: Order ID {order.id}")
@@ -290,7 +290,7 @@ def prioritizeOrder(request, order_id):
         return Response({"detail": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
     
     order.priority = 'high'
-    order.updated_at_at = datetime.now().date()
+    order.updated_at = datetime.now().date()
     order.save()
     return Response({"detail": "Order prioritized successfully"}, status=status.HTTP_200_OK)
 
@@ -476,7 +476,7 @@ def packOrder(request, order_id):
 
     # Update order status to packed
     order.status = 'packed'
-    order.updated_at_at = datetime.now().date()
+    order.updated_at = datetime.now().date()
     order.save()
 
     # Create activity record
