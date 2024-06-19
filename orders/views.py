@@ -9,6 +9,7 @@ from users.permissions import IsStaffUser
 from .serializers import OrderSerializer, OrderDetailSerializer
 from users.authentication import BearerTokenAuthentication
 from django.db.models import Case, When, Value, IntegerField, F, Sum
+from datetime import datetime
 
 
 def send_notification_to_admin(message):
@@ -438,6 +439,7 @@ def pickProduct(request, order_detail_id, location_barcode):
 
     # Update order detail status
     order_detail.status = 'picked'
+    order.updated_at_at = datetime.now().date()
     order_detail.save()
 
     # Check if all order details are picked, then update order status
@@ -471,6 +473,7 @@ def packOrder(request, order_id):
 
     # Update order status to packed
     order.status = 'packed'
+    order.updated_at_at = datetime.now().date()
     order.save()
 
     # Create activity record
@@ -520,6 +523,7 @@ def assignOrdersToDeliveryMan(request):
         if order.status == 'cancelled':
             return Response({"detail": "Some orders has been cancelled"}, status=status.HTTP_400_BAD_REQUEST)
         order.status = 'delivered'
+        order.delivered_at = datetime.now().date()
         order.save()
 
         # Send notification to customer
