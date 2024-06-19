@@ -9,6 +9,7 @@ from users.permissions import IsStaffUser
 from .serializers import OrderSerializer, OrderDetailSerializer
 from users.authentication import BearerTokenAuthentication
 from django.db.models import Case, When, Value, IntegerField, F, Sum
+from datetime import datetime
 
 
 def send_notification_to_admin(message):
@@ -207,6 +208,7 @@ def cancelOrder(request, order_id):
 
     # Update the order status to 'cancelled'
     order.status = 'cancelled'
+    order.updated_at = datetime.now().date()
     order.save()
 
     send_notification_to_admin(f"Order cancelled: Order ID {order.id}")
@@ -288,6 +290,7 @@ def prioritizeOrder(request, order_id):
         return Response({"detail": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
     
     order.priority = 'high'
+    order.updated_at = datetime.now().date()
     order.save()
     return Response({"detail": "Order prioritized successfully"}, status=status.HTTP_200_OK)
 
@@ -307,6 +310,7 @@ def updateOrderStatus(request, order_id):
         return Response({"detail": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
 
     order.status = new_status
+    order.updated_at_at = datetime.now().date()
     order.save()
 
     # Send notification to the customer
@@ -438,6 +442,7 @@ def pickProduct(request, order_detail_id, location_barcode):
 
     # Update order detail status
     order_detail.status = 'picked'
+    order.updated_at_at = datetime.now().date()
     order_detail.save()
 
     # Check if all order details are picked, then update order status
@@ -471,6 +476,7 @@ def packOrder(request, order_id):
 
     # Update order status to packed
     order.status = 'packed'
+    order.updated_at = datetime.now().date()
     order.save()
 
     # Create activity record
@@ -520,6 +526,7 @@ def assignOrdersToDeliveryMan(request):
         if order.status == 'cancelled':
             return Response({"detail": "Some orders has been cancelled"}, status=status.HTTP_400_BAD_REQUEST)
         order.status = 'delivered'
+        order.delivered_at = datetime.now().date()
         order.save()
 
         # Send notification to customer
@@ -546,5 +553,6 @@ def assignOrdersToDeliveryMan(request):
     )
 
     return Response({"detail": "Orders assigned to delivery man successfully"}, status=status.HTTP_200_OK)
+
 
 
