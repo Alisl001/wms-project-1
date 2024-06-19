@@ -1,10 +1,18 @@
 from rest_framework import serializers
 from backend.models import Order, OrderDetail, Product
+from django.contrib.auth.models import User
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name', 'email')
+
 
 class OrderDetailSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
@@ -14,7 +22,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     products = serializers.ListField(child=serializers.DictField(), write_only=True)
-
+    customer = UserSerializer()
     class Meta:
         model = Order
         fields = '__all__'
