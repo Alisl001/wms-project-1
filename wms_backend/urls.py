@@ -10,12 +10,13 @@ from suppliers.views import listSuppliers, supplierInfo, createSupplier, updateS
 from categories.views import listCategories, categoryInfo, createCategory, updateCategory, deleteCategory, uploadCategoryPhoto
 from products.views import createProduct, updateProduct, deleteProduct, getProductInfo, listProducts, listProductsByCategory, listProductsBySupplier, productSearch, uploadProductPhoto, getProductDetailsByBarcode, productSuggestions
 from favorites.views import createFavorite, deleteFavorite, myFavorites, topFavoriteProducts, productFavoritedByUsers, userFavoriteCount
-from inventory.views import createInventory, updateInventory, deleteInventory, listInventory,inventoryInfo
+from inventory.views import createInventory, updateInventory, deleteInventory, listInventory,inventoryInfo, transferProduct, cycleCount, createReplenishmentRequest, listReplenishmentRequests, approveReplenishmentRequest, rejectReplenishmentRequest
 from shipments.views import createShipment, updateShipment, deleteShipment, listShipments, shipmentInfo, receiveProduct, shipmentDetails
 from putaway.views import suggestLocations, browseReceivedProducts, putAwayProduct
 from orders.views import createOrder, updateOrder, cancelOrder, viewOrderStatus, getOrderDetails, viewMyOrders, listOrders, prioritizeOrder, updateOrderStatus, getPickList, pickProduct, packOrder, listPackedOrders, assignOrdersToDeliveryMan
 from activities.views import listActivities
 from wallets.views import listWallets, myTransactionLog, viewWallet, addFunds
+from reports.views import listReports, getReportById, generateReport
 
 
 urlpatterns = [
@@ -107,6 +108,13 @@ urlpatterns = [
     path('api/inventory/create/', createInventory, name='createInventory'),
     path('api/inventory/update/<int:id>/', updateInventory, name='updateInventory'),
     path('api/inventory/delete/<int:id>/', deleteInventory, name='deleteInventory'),
+    path('api/inventory/transfer/', transferProduct, name='transferProduct'),
+    path('api/inventory/cycle-count/', cycleCount, name='cycleCount'),
+    path('api/inventory/replenishment-request/create/', createReplenishmentRequest, name='createReplenishmentRequest'),
+    path('api/inventory/replenishment-requests/', listReplenishmentRequests, name='listReplenishmentRequests'),
+    path('api/inventory/replenishment-request/<int:request_id>/approve/', approveReplenishmentRequest, name='approveReplenishmentRequest'),
+    path('api/inventory/replenishment-request/<int:request_id>/reject/', rejectReplenishmentRequest, name='rejectReplenishmentRequest'),
+
 
     # Put Away APIs
     path('api/shipments/products/received/', browseReceivedProducts, name='receivedProducts'),
@@ -135,5 +143,9 @@ urlpatterns = [
     path('api/wallets/add-funds/', addFunds, name='addFunds'),
     path('api/wallets/my-transactions/', myTransactionLog, name='myTransactions'),
 
+    # Reports APIs
+    path('api/reports/', listReports, name='listReports'),
+    path('api/reports/<int:report_id>/', getReportById, name='getReportById'),
+    path('api/reports/generate/', generateReport, name='generateReport'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
