@@ -3263,6 +3263,41 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Assign order to delivery man Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "80c43e8a59fa4ae1b63daa6b592c9e9b2f11b40b",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/orders/delivery-records/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"orders",
+								"delivery-records",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
