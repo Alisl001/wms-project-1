@@ -13,7 +13,7 @@ from favorites.views import createFavorite, deleteFavorite, myFavorites, topFavo
 from inventory.views import createInventory, updateInventory, deleteInventory, listInventory,inventoryInfo, transferProduct, cycleCount, createReplenishmentRequest, listReplenishmentRequests, approveReplenishmentRequest, rejectReplenishmentRequest
 from shipments.views import createShipment, updateShipment, deleteShipment, listShipments, shipmentInfo, receiveProduct, shipmentDetails
 from putaway.views import suggestLocations, browseReceivedProducts, putAwayProduct
-from orders.views import createOrder, updateOrder, cancelOrder, viewOrderStatus, getOrderDetails, viewMyOrders, listOrders, prioritizeOrder, updateOrderStatus, getPickList, pickProduct, packOrder, listPackedOrders, assignOrdersToDeliveryMan
+from orders.views import deliveryRecordList, createOrder, updateOrder, cancelOrder, viewOrderStatus, getOrderDetails, viewMyOrders, listOrders, prioritizeOrder, updateOrderStatus, getPickList, pickProduct, packOrder, listPackedOrders, assignOrdersToDeliveryMan
 from activities.views import listActivities
 from wallets.views import listWallets, myTransactionLog, viewWallet, addFunds
 from reports.views import listReports, getReportById, generateReport
@@ -136,6 +136,7 @@ urlpatterns = [
     path('api/orders/pack/<int:order_id>/', packOrder, name='packOrder'),
     path('api/orders/packed/', listPackedOrders, name='listPackedOrders'),
     path('api/orders/assign-delivery-man/', assignOrdersToDeliveryMan, name='assignOrdersToDeliveryMan'),
+    path('api/orders/delivery-records/', deliveryRecordList, name='deliveryRecordList'),
 
     # Wallets management API
     path('api/wallets/my-wallet/', viewWallet, name='viewWallet'),
