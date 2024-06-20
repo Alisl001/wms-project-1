@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from backend.models import Order, OrderDetail, Product
+from backend.models import Order, OrderDetail, Product, DeliveryRecord
 from django.contrib.auth.models import User
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -20,9 +20,16 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         model = OrderDetail
         fields = '__all__'
 
-class OrderSerializer(serializers.ModelSerializer):
+class ListOrderSerializer(serializers.ModelSerializer):
     products = serializers.ListField(child=serializers.DictField(), write_only=True)
     customer = UserSerializer()
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    products = serializers.ListField(child=serializers.DictField(), write_only=True)
     class Meta:
         model = Order
         fields = '__all__'
@@ -48,5 +55,11 @@ class OrderSerializer(serializers.ModelSerializer):
                 status='pending'
             )
         return order
+
+
+class DeliveryRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryRecord
+        fields = '__all__'
 
 

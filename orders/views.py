@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from backend.models import Order, OrderDetail, Product, Notification, Inventory, Location, StockAdjustment, StockMovement, BarcodeScanning, Activity, DeliveryRecord, Wallet, TransactionLog
 from users.permissions import IsStaffUser
-from .serializers import OrderSerializer, OrderDetailSerializer
+from .serializers import DeliveryRecordSerializer, OrderSerializer, OrderDetailSerializer, ListOrderSerializer
 from users.authentication import BearerTokenAuthentication
 from django.db.models import Case, When, Value, IntegerField, F, Sum
 from datetime import datetime
@@ -225,7 +225,7 @@ def viewOrderStatus(request, order_id):
     except Order.DoesNotExist:
         return Response({"detail": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
     
-    serializer = OrderSerializer(order)
+    serializer = ListOrderSerializer(order)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -240,7 +240,7 @@ def getOrderDetails(request, order_id):
         return Response({"detail": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
 
     order_details = OrderDetail.objects.filter(order=order)
-    order_data = OrderSerializer(order).data
+    order_data = ListOrderSerializer(order).data
     order_data['details'] = OrderDetailSerializer(order_details, many=True).data
 
     return Response(order_data, status=status.HTTP_200_OK)
@@ -252,7 +252,7 @@ def getOrderDetails(request, order_id):
 @permission_classes([IsAuthenticated])
 def viewMyOrders(request):
     orders = Order.objects.filter(customer=request.user)
-    serializer = OrderSerializer(orders, many=True)
+    serializer = ListOrderSerializer(orders, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -275,7 +275,7 @@ def listOrders(request):
         )
     ).order_by('-is_pending', 'priority_level', '-created_at')
     
-    serializer = OrderSerializer(orders, many=True)
+    serializer = ListOrderSerializer(orders, many=True)
     return Response(serializer.data)
 
 
@@ -555,4 +555,14 @@ def assignOrdersToDeliveryMan(request):
     return Response({"detail": "Orders assigned to delivery man successfully"}, status=status.HTTP_200_OK)
 
 
+# Delivery Record List API
+@api_view(['GET'])
+@authentication_classes([BearerTokenAuthentication])
+@permission_classes([IsAdminUser])
+def deliveryRecordList(request):
+    if request.method == 'GET':
+        delivery_records = DeliveryRecord.objects.all().order_by('-date_assigned')
+        serializer = DeliveryRecordSerializer(delivery_records, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
