@@ -185,7 +185,7 @@ class Report(models.Model):
     ]
     report_type = models.CharField(max_length=20, choices=report_type_choices)
     generated_at = models.DateTimeField(auto_now_add=True)
-    data = models.JSONField()
+    data = models.TextField()
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, blank=True, null=True)
     
     def __str__(self):
@@ -292,7 +292,7 @@ class ReplenishmentRequest(models.Model):
     reason = models.TextField(null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-# DeliveryRecord model:
+# 23. DeliveryRecord model:
 class DeliveryRecord(models.Model):
     delivery_company = models.CharField(max_length=100)
     delivery_man_name = models.CharField(max_length=100)
