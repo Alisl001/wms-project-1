@@ -502,7 +502,7 @@ def packOrder(request, order_id):
 @permission_classes([IsAuthenticated])
 def listPackedOrders(request):
     packed_orders = Order.objects.filter(status='packed')
-    serializer = OrderSerializer(packed_orders, many=True)
+    serializer = ListOrderSerializer(packed_orders, many=True)
     return Response(serializer.data)
 
 
