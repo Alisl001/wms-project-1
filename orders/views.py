@@ -442,7 +442,7 @@ def pickProduct(request, order_detail_id, location_barcode):
 
     # Update order detail status
     order_detail.status = 'picked'
-    order.updated_at = datetime.now().date()
+    order_detail.updated_at = datetime.now().date()
     order_detail.save()
 
     # Check if all order details are picked, then update order status
@@ -565,4 +565,5 @@ def deliveryRecordList(request):
         serializer = DeliveryRecordSerializer(delivery_records, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+
 
