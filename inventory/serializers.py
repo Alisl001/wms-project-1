@@ -33,6 +33,7 @@ class CycleCountSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReplenishmentRequestSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
     class Meta:
         model = ReplenishmentRequest
         fields = '__all__'
