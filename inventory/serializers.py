@@ -34,6 +34,7 @@ class CycleCountSerializer(serializers.ModelSerializer):
 
 class ReplenishmentRequestSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
+    location = LocationSerializer()
     class Meta:
         model = ReplenishmentRequest
         fields = '__all__'
