@@ -14,13 +14,14 @@ from inventory.views import createInventory, updateInventory, deleteInventory, l
 from shipments.views import createShipment, updateShipment, deleteShipment, listShipments, shipmentInfo, receiveProduct, shipmentDetails
 from putaway.views import suggestLocations, browseReceivedProducts, putAwayProduct
 from orders.views import deliveryRecordList, createOrder, updateOrder, cancelOrder, viewOrderStatus, getOrderDetails, viewMyOrders, listOrders, prioritizeOrder, updateOrderStatus, getPickList, pickProduct, packOrder, listPackedOrders, assignOrdersToDeliveryMan
-from activities.views import listActivities
+from activities.views import listActivities, home
 from wallets.views import listWallets, myTransactionLog, viewWallet, addFunds
 from reports.views import listReports, getReportById, generateReport
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', home, name='home'),
 
     # User Management APIs
     path('api/register/', userRegistration, name='userRegister'),
