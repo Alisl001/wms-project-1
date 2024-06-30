@@ -63,19 +63,37 @@ def myFavorites(request):
 def topFavoriteProducts(request):
     top_products = Favorite.objects.values('product').annotate(favorite_count=Count('product')).order_by('-favorite_count')[:10]
     
-    # Retrieve the name of each product
-    product_names = {}
-    product_photos = {}
+    # Retrieve the name, photo URL, and price of each product
+    product_details = {}
     for item in top_products:
         product_id = item['product']
         product = Product.objects.filter(pk=product_id).first()
-        product_names[product_id] = product.name if product else None
-        product_photos[product_id] = product.photo if product else None
+        if product:
+            product_details[product_id] = {
+                'name': product.name,
+                'photo_url': product.photo.url if product.photo else None,
+                'price': product.price
+            }
+        else:
+            product_details[product_id] = {
+                'name': 'Unknown',
+                'photo_url': 'Unknown',
+                'price': None
+            }
 
-    # Construct the response data with product name included
-    data = [{'product_id': item['product'], 'product_name': product_names.get(item['product'], 'Unknown'), 'product_photo': product_photos.get(item['product'], 'Unknown'), 'favorite_count': item['favorite_count']} for item in top_products]
+    # Construct the response data with product name, photo URL, and price included
+    data = [
+        {
+            'product_id': item['product'],
+            'product_name': product_details[item['product']]['name'],
+            'product_photo': product_details[item['product']]['photo_url'],
+            'product_price': product_details[item['product']]['price'],
+            'favorite_count': item['favorite_count']
+        } 
+        for item in top_products
+    ]
     
-    return Response(data)
+    return Response(data)    
 
 
 # Product Favorited By Users API:
