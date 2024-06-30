@@ -15,10 +15,16 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+    def get_photo_url(self, obj):
+        if obj.photo:
+            return obj.photo.url
+        return None
+
 
 class MyFavoriteSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
     class Meta:
         model = Favorite
         fields = ['product']
+
 
