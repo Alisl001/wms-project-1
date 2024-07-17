@@ -25,9 +25,9 @@ class Command(BaseCommand):
             for rack in range(1, 5):
                 for level in range(0, 4):
                     if level == 0:
-                        capacity = 50000
+                        capacity = 4000000
                     else:
-                        capacity = 20000
+                        capacity = 2000000
                     name = f'A{aisle}R{rack}L{level}'
                     barcode_suffix = f'{warehouse_id}{aisle}{rack}{level}'
                     barcode = f'{random_prefix}{barcode_suffix}'
