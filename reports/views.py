@@ -34,8 +34,8 @@ def getReportById(request, report_id):
     except Report.DoesNotExist:
         return Response({"detail": "Report not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = ReportSerializer(report)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    # Return the data as a string
+    return Response({"report": report.data}, status=status.HTTP_200_OK)
 
 
 # Generate Report API
@@ -66,8 +66,8 @@ def generateReport(request):
     else:
         return Response({"detail": "Invalid report type"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Serialize the data to JSON string before saving
-    data_json = json.dumps(data)
+    # Serialize the data to a string before saving
+    data_str = str(data)
 
     # Check if a similar report already exists
     similar_reports = Report.objects.filter(
@@ -86,16 +86,13 @@ def generateReport(request):
         report = Report(
             report_type=report_type,
             generated_at=datetime.now(),
-            data=data_json,
+            data=data_str,
             warehouse=warehouse
         )
         report.save()
 
-    # Serialize the Report instance using ReportSerializer
-    serializer = ReportSerializer(report)
-
-    # Return the serialized data including the 'id'
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    # Return the string data
+    return Response({"report": report.data}, status=status.HTTP_201_CREATED)
 
 
 # Sales Report Function
@@ -172,7 +169,7 @@ def generate_sales_report(warehouse=None):
     )
     report.save()
 
-    return json_data
+    return data
 
 
 # Inventory Reports Function
@@ -267,7 +264,7 @@ def generate_inventory_report(warehouse=None):
         )
         report.save()
 
-        return json_data
+        return data
 
     except KeyError as e:
         # Handle KeyError specifically for missing columns
@@ -367,7 +364,7 @@ def generate_activity_report(warehouse=None):
         )
         report.save()
 
-        return json_data
+        return data
 
     except KeyError as e:
         # Handle KeyError specifically for missing columns
