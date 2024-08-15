@@ -244,7 +244,7 @@ def createReplenishmentRequest(request):
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAdminUser])
 def listReplenishmentRequests(request):
-    requests = ReplenishmentRequest.objects.all()
+    requests = ReplenishmentRequest.objects.all().order_by('-timestamp')
     serializer = ReplenishmentRequestSerializer(requests, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 

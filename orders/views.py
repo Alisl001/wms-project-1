@@ -251,7 +251,7 @@ def getOrderDetails(request, order_id):
 @authentication_classes([BearerTokenAuthentication])
 @permission_classes([IsAuthenticated])
 def viewMyOrders(request):
-    orders = Order.objects.filter(customer=request.user)
+    orders = Order.objects.filter(customer=request.user).order_by('-created_at')
     serializer = ListOrderSerializer(orders, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
